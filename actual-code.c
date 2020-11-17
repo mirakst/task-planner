@@ -5,23 +5,22 @@ void hallihallo2 (int diller);
 void fuckdam(void);
 
 int main (void) {
-  int i = 1;
-
-    hallihallo2(i);
+    int i = 1;
     int num = 69;
+
     printf("Now, this is pod racing!\n");
-    printf("Danny D knows whats up");
+    printf("Danny D knows whats up\n");
     printf("Nikolaj er mongol,\n");
-    printf("Nikolaj er en dreng på 12 år :)");
+    printf("Nikolaj er en dreng på 12 år :)\n");
     printf("Nikolajs mor er 24 år gammel.\n");
     printf("Nikolaj er en fucking stor mongol!!\n");
-    printf("Num multiplied by 2 is: %d", test_function(num));
+    printf("Num multiplied by 2 is: %d\n", test_function(num));
     fuckdam();
     return 1;
 }
 
-int test_function (num) {
-    printf("The number is: %d", num);
+int test_function (int num) {
+    printf("The number is: %d\n", num);
     return num * 2;
 }
 
@@ -38,7 +37,7 @@ void fuckdam(void){
 
     for (i = 0; i < 14; i++)
     {
-        printf("%s", noice[i]);
+        printf("%c", noice[i]);
     }
     
     printf("\n");
