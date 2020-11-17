@@ -1,4 +1,4 @@
-# energy-advisor
+# upgraded-potato
 
 Hello motherfuckers
 
