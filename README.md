@@ -2,7 +2,7 @@
 
 Hello motherfuckers
 
-Fuck Nikolaj
+Fuck @damniko
 
 Fisse
 fuck asier
@@ -10,3 +10,5 @@ fuck asier
 Anders sutter - passer ikke spasser
 
 mvh A405A, deez nuts og det der
+
+Testing motherfuckers
