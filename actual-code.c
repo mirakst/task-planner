@@ -36,7 +36,7 @@ int test_function (int num) {
 }
 
 void fuckdam(void){
-    printf("Fuck DamDumDude");
+    printf("Fuck DamDumDude\n");
     return;
 }
 
