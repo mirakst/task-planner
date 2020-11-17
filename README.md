@@ -1,26 +1,24 @@
-# upgraded-potato
+## Skriveregler
+Curly brackets sidder umiddelbart efter det de starter (Funktioner, løkker osv.)
 
-Hello motherfuckers
+int fn (type) {
 
-Fuck @damniko
+Løkker med kun 1 linje kode benytter ikke curly brackets.
 
-Fisse
-fuck asier
+    if this
+        code
 
-## Subheader
+Funktioner starter med store bogstaver før og efter underscore (_)
 
-Anders sutter - passer ikke spasser jov det gør fuck u
+Calculate_Prices
 
-mvh A405A, deez nuts og det der
+I prototyper skrives kun datatype, og ikke variabelnavne.
 
-Testing motherfuckers
+Prototype (Int, char)
 
-Anyways, let's do this.
+Indrykning består af intervaller på 4 mellemrum
 
-lmao
-
-,
-
-Test om jeg kan overwrite en anden ændring
-
-bitch mikkel
+int main (void) {
+    Code is indented
+    Like this
+}
