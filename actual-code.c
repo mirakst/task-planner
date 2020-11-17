@@ -1,7 +1,6 @@
 #include <stdio.h>
 
 int test_function (int);
-void hallihallo2 (int diller);
 void fuckdam(void);
 
 int main (void) {
@@ -24,11 +23,6 @@ int test_function (int num) {
     return num * 2;
 }
 
-void hallihallo (int diller) {
-    printf("%d\n", diller);
-    
-    return;
-}
 
 void fuckdam(void){
     int i;
