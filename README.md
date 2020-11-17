@@ -2,7 +2,7 @@
 
 Hello motherfuckers
 
-Fuck Nikolaj
+Fuck @damniko
 
 Fisse
 fuck asier
