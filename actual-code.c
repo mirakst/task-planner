@@ -21,15 +21,10 @@ int main (void) {
     return 1;
 }
 
-<<<<<<< HEAD
-void fuckdam(void){
-    printf("Fuck DamDumDude");
-    return
-}
-
 void hallihallo (int diller) {
 printf("%d\n", diller);
-=======
+}
+
 int test_function (int num) {
     printf("The number is: %d.\n", num);
     return num + 1;
@@ -38,9 +33,4 @@ int test_function (int num) {
 void fuckdam(void){
     printf("Fuck DamDumDude\n");
     return;
-}
-
-void hallihallo (void) {
->>>>>>> 610aaa541a43a17f11bb70703a7c3858c5aad95c
-
 }
