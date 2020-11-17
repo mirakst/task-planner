@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 void fuckdam(void);
+void hallihallo (void);
 
 int main (void) {
     printf("Now, this is pod racing!\n");
@@ -20,4 +21,9 @@ int main (void) {
 void fuckdam(void){
     printf("Fuck DamDumDude");
     return
+void hallihallo (void) {
+
+
+
+
 }
