@@ -1,8 +1,11 @@
 #include <stdio.h>
 
-void hallihallo (void);
+void hallihallo (int diller;
 
 int main (void) {
+  int i = 1;
+
+  hallihallo(i);
     printf("Now, this is pod racing!\n");
     printf("Danny D knows whats up");
     printf("Nikolaj er mongol,\n");
@@ -12,9 +15,9 @@ int main (void) {
     return 1;
 }
 
-void hallihallo (void) {
+void hallihallo (int diller) {
 
 
-
+printf("%d", diller);
 
 }
