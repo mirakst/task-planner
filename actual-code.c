@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+void hallihallo (void);
+
 int main (void) {
     printf("Now, this is pod racing!\n");
     printf("Danny D knows whats up");
@@ -8,4 +10,11 @@ int main (void) {
     printf("Nikolajs mor er 24 år gammel.\n");
     printf("Nikolaj er en fucking stor mongol!!\n");
     return 1;
+}
+
+void hallihallo (void) {
+
+
+
+
 }
