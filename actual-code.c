@@ -1,13 +1,13 @@
 #include <stdio.h>
 int test_function (int);
 
-void hallihallo (int diller);
+void hallihallo2 (int diller);
 void fuckdam(void);
 
 int main (void) {
   int i = 1;
 
-  hallihallo(i);
+    hallihallo2(i);
     int num = 69;
     printf("Now, this is pod racing!\n");
     printf("Danny D knows whats up");
@@ -30,7 +30,7 @@ int test_function (int num) {
     return num + 1;
 }
 
-void fuckdam(void){
+void fuckdam(void) {
     printf("Fuck DamDumDude\n");
     return;
 }
