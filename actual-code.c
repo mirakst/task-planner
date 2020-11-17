@@ -24,7 +24,18 @@ int test_function (int num) {
 }
 
 void fuckdam(void){
+    int i;
+
+    char noice[] = {'N', 'i', 'k', 'o', 'l', 'a', 'j', ' ', 'e', 'r', ' ', 'd', 'u', 'm'};
+
+    for (i = 0; i < 14; i++)
+    {
+        printf("%s", noice[i]);
+    }
+    
+    printf("\n");
     printf("Fuck DamDumDude\n");
+    
     return;
 }
 
