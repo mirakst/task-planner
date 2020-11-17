@@ -27,6 +27,7 @@ int test_function (num) {
 
 void hallihallo (int diller) {
 printf("%d\n", diller);
+}
 
 void fuckdam(void) {
     printf("Fuck DamDumDude\n");
