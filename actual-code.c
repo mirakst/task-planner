@@ -1,6 +1,6 @@
 #include <stdio.h>
-int test_function (int);
 
+int test_function (int);
 void hallihallo2 (int diller);
 void fuckdam(void);
 
@@ -42,7 +42,6 @@ void fuckdam(void){
     }
     
     printf("\n");
-
     printf("Fuck DamDumDude\n");
     
     return;
