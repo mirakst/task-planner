@@ -20,7 +20,9 @@ int main (void) {
 
 void fuckdam(void){
     printf("Fuck DamDumDude");
-    return
+    return;
+}
+
 void hallihallo (void) {
 
 
