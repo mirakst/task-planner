@@ -1,26 +1,14 @@
-# upgraded-potato
+# Skrive regler
 
-Hello motherfuckers
+funktioner: (curly bracket på samme linje som funktionen)
+int fn (type) { ... }
 
-Fuck @damniko
+Enkelt linje if statements: (ingen curly bracket)
+if (nikolaj.sej)
+    printf("Lies!");
+    
+Funktions navngivning: (Store bogstaver og underscore for mellemrum)
+Calculate_Prices ()
 
-Fisse
-fuck asier
-
-## Subheader
-
-Anders sutter - passer ikke spasser jov det gør fuck u
-
-mvh A405A, deez nuts og det der
-
-Testing motherfuckers
-
-Anyways, let's do this.
-
-lmao
-
-,
-
-Test om jeg kan overwrite en anden ændring
-
-bitch mikkel
+Prototyper: (kun datatyperne ikke variabelnavne)
+prototype (int, char)
