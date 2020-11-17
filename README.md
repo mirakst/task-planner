@@ -18,7 +18,7 @@ Prototype (Int, char)
 
 Indrykning består af intervaller på 4 mellemrum
 
-int main (void) {
-    Code is indented
-    Like this
-}
+    int main (void) {
+        Code is indented
+        Like this
+    }
