@@ -21,16 +21,12 @@ int main (void) {
     return 1;
 }
 
+void fuckdam(void){
+    printf("Fuck DamDumDude");
+    return
+}
+
 void hallihallo (int diller) {
 printf("%d\n", diller);
-}
 
-int test_function (int num) {
-    printf("The number is: %d.\n", num);
-    return num + 1;
-}
-
-void fuckdam(void){
-    printf("Fuck DamDumDude\n");
-    return;
 }
