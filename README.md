@@ -2,7 +2,7 @@
 
 Curly brackets sidder umiddelbart efter det de starter (Funktioner, løkker osv.)
 
-int fn (type) {
+    int fn (type) {
 
 Løkker med kun 1 linje kode benytter ikke curly brackets.
 
@@ -11,11 +11,11 @@ Løkker med kun 1 linje kode benytter ikke curly brackets.
 
 Funktioner starter med store bogstaver før og efter underscore (\_)
 
-Calculate_Prices
+    Calculate_Prices
 
 I prototyper skrives kun datatype, og ikke variabelnavne.
 
-Prototype (Int, char)
+    Prototype (Int, char)
 
 Indrykning består af intervaller på 4 mellemrum
 
