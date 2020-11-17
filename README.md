@@ -7,6 +7,6 @@ Fuck Nikolaj
 Fisse
 fuck asier
 
-Anders sutter
+Anders sutter - passer ikke spasser
 
 mvh A405A, deez nuts og det der
