@@ -5,7 +5,7 @@ void hallihallo2 (int diller);
 void fuckdam(void);
 
 int main (void) {
-  int i = 1;
+    int i = 1;
 
     hallihallo2(i);
     int num = 69;
