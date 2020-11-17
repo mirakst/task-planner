@@ -1,5 +1,8 @@
+#include <stdio.h>
+
 int main (void) {
     printf("Now, this is pod racing!\n");
-    printf("Nikolaj er mongolasdsa,\n");
+    printf("Danny D knows whats up");
+    printf("Nikolaj er mongol,\n");
     return 1;
 }
