@@ -1,18 +1,35 @@
-# Skrive regler
+## Skriveregler
 
-funktioner (curly bracket på samme linje som funktionen):
+Curly brackets sidder umiddelbart efter det de starter (Funktioner, løkker osv.)
 
-int fn (type) { ... }
+    int fn (type) {
 
-Enkelt linje if statements (ingen curly bracket):
+Løkker med kun 1 linje kode benytter ikke curly brackets.
 
-if (nikolaj.sej)
-    printf("Lies!");
-    
-Funktions navngivning (Store bogstaver og underscore for mellemrum):
+    if this
+        code
 
-Calculate_Prices ()
+Funktioner starter med store bogstaver før og efter underscore (\_)
 
-Prototyper (kun datatyperne ikke variabelnavne):
+    Calculate_Prices
 
-prototype (int, char)
+I prototyper skrives kun datatype, og ikke variabelnavne.
+
+    Prototype (Int, char)
+
+Indrykning består af intervaller på 4 mellemrum
+
+    int main (void) {
+        Code is indented
+        Like this
+    }
+
+## Prioriteringsliste
+
+1. God data på timepris, og god formidling af det.
+   * Calculate_Prices
+2. Brugerindflydelse på output.
+   * Get_User_Data
+   * Load_User_Data
+3. Tasks/Devices til planlægning af forbrug.
+   * Modify_Tasks_And_Devices
