@@ -23,3 +23,13 @@ Indrykning består af intervaller på 4 mellemrum
         Code is indented
         Like this
     }
+
+## Prioriteringsliste
+
+1. God data på timepris, og god formidling af det.
+   * Calculate_Prices
+2. Brugerindflydelse på output.
+   * Get_User_Data
+   * Load_User_Data
+3. Tasks/Devices til planlægning af forbrug.
+   * Modify_Tasks_And_Devices
