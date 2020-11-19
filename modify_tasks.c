@@ -2,9 +2,7 @@
 /* TODO: 
  * Test-cases (too long task name, char instead of int, etc...)
  * Save and load to file....
- * Print name of task instead of id when removing
  * Måske: sortere liste alfabetisk (eller efter bruger-indstilling?)
- * Bedre variable-navne
  */
 
 #include <stdio.h>
@@ -13,7 +11,7 @@
 #include <ctype.h>
 
 #define SENTINEL "exit"
-#define EMPTY_TASK "none"
+#define EMPTY_TASK_NAME "none"
 #define TASK_NAME_MAX 20
 #define TASK_AMOUNT_MAX 10
 #define INPUT_MAX 50
@@ -43,7 +41,8 @@ int Task_Compare (const void *, const void *);
 
 int main (void) {
     task task_list[TASK_AMOUNT_MAX];
-    char cmd_input[INPUT_MAX];
+    char cmd_input[INPUT_MAX],
+         temp_task_name[TASK_NAME_MAX];
     int task_amount = 0,
         task_id = 0;
 
@@ -74,7 +73,6 @@ int main (void) {
             }
             else {
                 task_list[task_amount] = Add_Task();
-                printf("Task %d was successfully added.\n", task_amount + 1);
                 task_amount++; 
             }
         }
@@ -90,9 +88,10 @@ int main (void) {
                 printf("The id was not recognized.\n");
             } 
             else {
+                strcpy(temp_task_name, task_list[task_id - 1].name);
                 task_list[(task_id - 1)] = Remove_Task();
-                if (!strcmp(task_list[(task_id - 1)].name, EMPTY_TASK))
-                    printf("Task %d was successfully removed.\n", task_id);
+                if (!strcmp(task_list[(task_id - 1)].name, EMPTY_TASK_NAME))
+                    printf("Task: %s was successfully removed.\n", temp_task_name);
                 
                 task_amount--;
                 Sort_Tasks(task_list);
@@ -126,8 +125,12 @@ task Add_Task (void) {
     printf("Power usage (watts): ");
     scanf(" %d", &power);
     printf("Task duration (min): ");
-    scanf(" %d", &use_time);
+    scanf(" %d", &use_time);    
 
+    if(!strcmp(name, EMPTY_TASK_NAME) || power <= 0 || use_time <= 0) {
+        printf("Error in user input, cancelling...\n"); return Remove_Task();
+    }
+    printf("Task: %s was successfully added.\n", name);
     strcpy(result.name, name);
     result.power = power;
     result.use_time = use_time;
@@ -146,7 +149,7 @@ task Add_Task_DEBUG (char *name, int power, int use_time) {
 /* Returns an 'empty' task */
 task Remove_Task (void) {
     task result;
-    strcpy(result.name, EMPTY_TASK);
+    strcpy(result.name, EMPTY_TASK_NAME);
     result.power = 0;
     result.use_time = 0;    
     return result;
@@ -162,9 +165,9 @@ int Task_Compare (const void *ip1, const void *ip2) {
     const task *task1 = (task *) ip1,
                *task2 = (task *) ip2;
 
-    if(strcmp(task1->name, EMPTY_TASK) == 0 && strcmp(task2->name, EMPTY_TASK) != 0)
+    if(strcmp(task1->name, EMPTY_TASK_NAME) == 0 && strcmp(task2->name, EMPTY_TASK_NAME) != 0)
         return 1;
-    else if(strcmp(task1->name, EMPTY_TASK) != 0 && strcmp(task2->name, EMPTY_TASK) == 0)
+    else if(strcmp(task1->name, EMPTY_TASK_NAME) != 0 && strcmp(task2->name, EMPTY_TASK_NAME) == 0)
         return -1;
     else
         return 1;
@@ -173,10 +176,13 @@ int Task_Compare (const void *ip1, const void *ip2) {
 /* Prints the list of all tasks, excluding the empty tasks */
 void Print_List(task *task_list, int task_amount) {
     int i;
+    if(task_amount == 0) {
+        printf("There are currently no tasks. Enter 'add' to begin adding some.\n"); return;
+    }
     printf("\n----------------- Task  list -----------------\n");  
     printf("%13s%22s%11s\n", "Name", "Power", "Use time");    
     for (i = 0; i < TASK_AMOUNT_MAX; i++) {
-        if (strcmp(task_list[i].name, EMPTY_TASK) != 0) {
+        if (strcmp(task_list[i].name, EMPTY_TASK_NAME) != 0) {
             printf("Task %2d: %-20s %3d W %6d min\n", (i + 1), task_list[i].name, task_list[i].power, task_list[i].use_time);
         }
     }
