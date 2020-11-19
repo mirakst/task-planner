@@ -3,8 +3,8 @@
  * Test-cases (too long task name, char instead of int, etc...)
  * Save and load to file....
  * Print name of task instead of id when removing
- * Måske: sortere liste alfabetisk (eller efter bruger-indstilling?)
- * Bedre variable-navne
+ * Sort list lexicographically (or by a user setting?)
+ * Fix print when there are no tasks
  */
 
 #include <stdio.h>
