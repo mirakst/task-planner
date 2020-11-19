@@ -23,8 +23,8 @@ int main (void) {
         printf("[DEBUG] The price stored in slot [%d] is: %.2f\n", i, prices[i][0]);
     }
     printf("\n");
-
-    qsort(prices, 24, 2*(sizeof(double)), cmp);
+    
+    qsort(prices, HOURS_PR_DAY, 2*(sizeof(double)), cmp);
     
     for (i = 0; i < HOURS_PR_DAY; i++) {
         printf("[DEBUG] The sorted prices are hour [%2.0f]: %.2f\n", prices[i][1], prices[i][0]);
