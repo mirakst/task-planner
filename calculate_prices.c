@@ -26,20 +26,22 @@ double** main (void) {
     Load_Prices (str, fp, prices);
 
     for (i = 0; i < HOURS_PR_DAY; i++) {
-        printf("[DEBUG] The price stored in slot [%d] is: %.2f\n", i, prices[i][0]);
+        printf("[DEBUG] The price stored in slot" 
+               "[%d] is: %.2f\n", i, prices[i][0]);
     }
     printf("\n");
     
     qsort(prices, HOURS_PR_DAY, 2*(sizeof(double)), Double_Compare);
     
     for (i = 0; i < HOURS_PR_DAY; i++) {
-        printf("[DEBUG] The sorted prices are hour [%2.0f]: %.2f\n", prices[i][1], prices[i][0]);
+        printf("[DEBUG] The sorted prices are hour "
+               "[%2.0f]: %.2f\n", prices[i][1], prices[i][0]);
     }
 
     return prices;
 }
 
-/* A comparing function for qsort, typecasting input to doubles so it will be sorted properly */
+/* A comparing function for qsort, typecasting input to doubles */
 int Double_Compare (const void *x, const void *y) {
   double xx = *(double*)x, yy = *(double*)y;
   if (xx < yy) return -1;
@@ -47,7 +49,8 @@ int Double_Compare (const void *x, const void *y) {
   return 0;
 }
 
-/* A function that fetches 24 lines worth of prices from file fp, then assigns them to numbered 2d array */
+/* A function that fetches 24 lines worth of prices from file fp, 
+ * then assigns them to numbered 2d array */
 void Load_Prices (char* str, FILE *fp, double prices[][2]) {
     int i;
     for (i = 0; i < HOURS_PR_DAY; i++) {
