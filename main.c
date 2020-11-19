@@ -50,7 +50,7 @@ int main (void) {
 void string_to_lower(char *str) {
     int i;
     for (i = 0; i < INPUT_MAX; i++)
-            str[i] = tolower(str[i]);
+        str[i] = tolower(str[i]);
 }
 
 int compare_command (char *str) {

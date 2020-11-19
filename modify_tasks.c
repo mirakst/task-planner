@@ -36,17 +36,16 @@ int main (void) {
     int task_amount = 0,
         task_id = 0;
 
-    task_list[0] = Add_Task_DEBUG("Opvasker", 55, 180);
+    task_list[0] = Add_Task_DEBUG("Opvaskning", 55, 180);
     task_list[1] = Add_Task_DEBUG("Vaskemaskine", 45, 180);
-    task_list[2] = Add_Task_DEBUG("Stoevsuger", 35, 30);
-    task_list[3] = Add_Task_DEBUG("Haandmixer", 5, 10);
-    task_list[4] = Add_Task_DEBUG("Mikrovn", 30, 5);
+    task_list[2] = Add_Task_DEBUG("Stoevsugning", 35, 30);
+    task_list[3] = Add_Task_DEBUG("Haandmixing", 5, 10);
+    task_list[4] = Add_Task_DEBUG("Mikroovning", 30, 5);
     task_amount = 5;
 
     printf("\n---------------- Modify tasks ----------------\n");
 
-    do
-    {
+    do {
         /* Get user input and convert to lower case letters */
         printf("\nPlease enter a command: ");
         scanf(" %s", cmd_input);
