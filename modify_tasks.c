@@ -2,7 +2,7 @@
 /* TODO: 
  * Test-cases (too long task name, char instead of int, etc...)
  * Save and load to file....
- * Måske: sortere liste alfabetisk (eller efter bruger-indstilling?)
+ * Sort list lexicographically (or by a user setting?)
  */
 
 #include <stdio.h>
