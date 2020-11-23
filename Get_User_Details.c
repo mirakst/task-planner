@@ -19,7 +19,6 @@ typedef struct User_Details User;
 void Get_Name (User *);
 void Get_available_Hours (int time[][1]);
 void Save_To_File (User User);
-//void Make_Timetable (int *time);
 
 
 int main (void) {
