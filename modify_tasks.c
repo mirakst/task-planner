@@ -1,9 +1,4 @@
-/* Navne - Mails? - Gruppe - Software */
-/* TODO: 
- * Test-cases (too long task name, char instead of int, etc...)
- * Save and load to file....
- * Sort list lexicographically (or by a user setting?)
- */
+/* -- DEPRECATED -- Use tasks.c instead! */
 
 #include <stdio.h>
 #include <stdlib.h>
