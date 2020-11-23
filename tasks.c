@@ -8,16 +8,6 @@
 #include <string.h>
 #include "tasks.h"
 
-/* Should be appended to the main print help function. */
-void Print_Help (void) {
-    printf("\n-------------------------- Commands ---------------------------\n");
-    printf("%-11s -- Lists all tasks.\n", "List");
-    printf("%-11s -- Add a new task.\n", "Add");
-    printf("%-11s -- Remove a task\n", "Remove (id)");
-    printf("%-11s -- Go back to main.\n", "Back");
-    printf("----------------------------------------------------------------\n");
-}
-
 /* This must be appended to the calling function in the main program file
  *
  * Variables
@@ -55,19 +45,29 @@ void Print_Help (void) {
  *      printf("Failed to save task configuration file: %s.\n", FILE_TASKLIST);
  */
 
+/* Should be appended to the main print help function. */
+void Print_Help (void) {
+    printf("\n-------------------------- Commands ----------------------------\n");
+    printf("%-11s -- Lists all tasks.\n", "List");
+    printf("%-11s -- Add a new task.\n", "Add");
+    printf("%-11s -- Remove a task\n", "Remove (id)");
+    printf("%-11s -- Go back to main.\n", "Back");
+    printf("----------------------------------------------------------------\n");
+}
+
 /* Prints a list of all non-empty tasks */
-void Print_List (task *task_list, int task_amount) {
+void Print_Task_List (task *task_list, int task_amount) {
     int i;
     if (task_amount == 0) {
         printf("There are currently no tasks. Enter 'add' to begin adding some.\n"); 
         return;
     }
     printf("\n-------------------------- Task  list --------------------------\n");  
-    printf("%13s%24s%13s%14s\n", "Name", "Power use", "Duration", "Hourly usage");    
+    printf("%7s%6s%23s%13s%15s\n", "ID", "Name", "Power", "Duration", "Energy usage");    
     for (i = 0; i < TASK_AMOUNT_MAX; i++) {
         if (strcmp(task_list[i].name, EMPTY_TASK_NAME) != 0) {
-            printf("Task %2d: %-20s %5d W %8d min %10.2lf Wh\n", (i + 1),
-                    task_list[i].name, task_list[i].power, task_list[i].duration, task_list[i].watt_hrs);
+            printf("Task %2d: %-20s %4d W %8d min %10.3lf kWh\n", (i + 1),
+                    task_list[i].name, task_list[i].power, task_list[i].duration, task_list[i].kWh);
         }
     }
     printf("----------------------------------------------------------------\n");
@@ -90,7 +90,7 @@ int Load_Tasks (task *task_list, int *task_amount) {
         strcpy(task_list[*task_amount].name, task_name);
         task_list[*task_amount].power = task_power;
         task_list[*task_amount].duration = task_duration;
-        task_list[*task_amount].watt_hrs = task_power * ((double)task_duration / 60.0);
+        task_list[*task_amount].kWh = (task_power * ((double)task_duration / 60.0)) / 1000;
         *task_amount += 1;
     }
     Sort_Task_List(task_list);
@@ -128,7 +128,7 @@ void Initialize_Tasks (task *task_list, int *task_amount) {
         strcpy(task_list[i].name, EMPTY_TASK_NAME);
         task_list[i].power = 0;
         task_list[i].duration = 0; 
-        task_list[i].watt_hrs = 0.0;
+        task_list[i].kWh = 0.0;
     }
 }
 
@@ -159,7 +159,7 @@ void Add_Task (task *task_list, int *task_amount) {
     strcpy(result.name, name);
     result.power = power;
     result.duration = duration;
-    result.watt_hrs = power * ((double)duration / 60.0);
+    result.kWh = (power * ((double)duration / 60.0)) / 1000;
 
     task_list[*task_amount] = result;
     *task_amount += 1;
@@ -197,9 +197,9 @@ int Compare_Tasks (const void *ip1, const void *ip2) {
     const task *task1 = (task *) ip1,
                *task2 = (task *) ip2;
     
-    if (task1->watt_hrs > task2->watt_hrs)
+    if (task1->kWh > task2->kWh)
         return -1;
-    else if (task1->watt_hrs < task2->watt_hrs)
+    else if (task1->kWh < task2->kWh)
         return 1;
     else
         return 0;
