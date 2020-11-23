@@ -1,44 +1,26 @@
-/* main needs to be renamed to Calculate_Prices to be properly integrated in main program.
- * Instead of void, main will take pointer arguments for the file and the array. */
-
 #include <stdio.h>
 #include <stdlib.h>
+#include "calculate_prices.h"
 
 #define HOURS_PR_DAY 24
 
-/* Prototypes */
-int Double_Compare (const void *, const void *);
-void Load_Prices (char*, FILE *fp, double prices[][2]);
 
-/* Return type is double** so it can return the 2d array prices */
-double** main (void) {
-    FILE *fp = fopen("prices.txt", "r");
-    char str[13];
+/* Returns price of hours sorted, as double values. */
+void Calculate_Prices (double prices[][2]) {
+    char str[13],
+         filename[11] = "prices.txt";
+    FILE *fp = fopen(filename, "r");
     int i;
-    double prices[HOURS_PR_DAY][2];
 
-/* Error message in case the file doesn't load correctly */
     if (fp == NULL) {
-        printf("Error opening file.\n");
-        return -1;
+        printf("Error opening file '%s'.\n", filename);
+        return;
     }
 
     Load_Prices (str, fp, prices);
-
-    for (i = 0; i < HOURS_PR_DAY; i++) {
-        printf("[DEBUG] The price stored in slot" 
-               "[%d] is: %.2f\n", i, prices[i][0]);
-    }
-    printf("\n");
-    
     qsort(prices, HOURS_PR_DAY, 2*(sizeof(double)), Double_Compare);
     
-    for (i = 0; i < HOURS_PR_DAY; i++) {
-        printf("[DEBUG] The sorted prices are hour "
-               "[%2.0f]: %.2f\n", prices[i][1], prices[i][0]);
-    }
-
-    return prices;
+    return;
 }
 
 /* A comparing function for qsort, typecasting input to doubles */
@@ -55,10 +37,9 @@ void Load_Prices (char* str, FILE *fp, double prices[][2]) {
     int i;
     for (i = 0; i < HOURS_PR_DAY; i++) {
         fgets(str, 13, fp);
-        printf("[DEBUG] The price fetched is: %s", str);
+        /* printf("[DEBUG] The price fetched is: %s", str); */
         prices[i][1] = i;
-        prices[i][0] = strtod(str, str+6);
+        prices[i][0] = strtod(str, NULL);
     }
-    printf("\n\n");
     return;
 }
