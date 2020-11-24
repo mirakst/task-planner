@@ -1,5 +1,5 @@
 #define HOURS_PR_DAY 24
-#define PRICES_FILE "prices.txt"
+#define PRICES_FILE "config/prices"
 
 int Double_Compare (const void *, const void *);
 void Load_Prices (char*, FILE*, double[][2]);

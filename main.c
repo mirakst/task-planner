@@ -195,7 +195,8 @@ void Print_Help (int cmd, int print_all) {
         if(!print_all)
             break;
     case cmd_help_prices:
-        printf("%-13s -- Lists prices pr hour\n", "List prices");
+        printf("%-18s -- Lists prices pr hour\n", "List prices");
+        printf("%-18s -- Lists the hourly prices, sorted\n", "List prices sorted");
         if(!print_all)
             break;
     }

@@ -1,4 +1,4 @@
-#define FILE_TASKLIST "tasklist.txt"
+#define FILE_TASKLIST "config/tasklist.cfg"
 #define TASK_AMOUNT_MAX 10
 #define TASK_NAME_MAX 20
 #define EMPTY_TASK_NAME "none"
