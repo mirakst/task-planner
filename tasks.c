@@ -1,59 +1,12 @@
-/* Navne - Mails? - Gruppe - Software */
 /* TODO: 
  * Test-cases (too long task name, char instead of int, etc...)
+ * Bool in task struct (get_suggestions?)
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "tasks.h"
-
-/* This must be appended to the calling function in the main program file
- *
- * Variables
- * task task_list[TASK_AMOUNT_MAX];   
- * int task_amount = 0, task_id = 0;
- * int file_status = 0;                 
- *
- * 1. Set all tasks to be empty
- *    Run this at the beginning
- * Initialize_Tasks(task_list, &task_amount);
- *
- * 2. Then try to load a config
- * file_status = Load_Tasks(task_list, &task_amount);                           
- * if (file_status == 1)                                                        
- *    printf("Loaded %d tasks successfully.\n", task_amount);                   
- * else if (file_status == -1)                                                  
- *     printf("Failed to load task configuration file: %s.\n", FILE_TASKLIST);  
- *
- * 3. Listen to user input here 
- * List  
- * Print_List(task_list, task_amount);            
- *
- * Add
- * Add_Task(task_list, &task_amount);             
- *
- * Remove
- * Get task_id from user first, then
- * Remove_Task(task_list, &task_amount, task_id);
- *
- * 4. Save the configuration 
- * file_status = Save_Tasks(task_list, task_amount);                            
- * if(file_status == 1)                                                         
- *      printf("Saved %d tasks successfully.\n", task_amount);                  
- * else if (file_status == -1)                                                 
- *      printf("Failed to save task configuration file: %s.\n", FILE_TASKLIST);
- */
-
-/* Should be appended to the main print help function. */
-void Print_Help (void) {
-    printf("\n-------------------------- Commands ----------------------------\n");
-    printf("%-11s -- Lists all tasks.\n", "List");
-    printf("%-11s -- Add a new task.\n", "Add");
-    printf("%-11s -- Remove a task\n", "Remove (id)");
-    printf("%-11s -- Go back to main.\n", "Back");
-    printf("----------------------------------------------------------------\n");
-}
 
 /* Prints a list of all non-empty tasks */
 void Print_Task_List (task *task_list, int task_amount) {
@@ -62,7 +15,7 @@ void Print_Task_List (task *task_list, int task_amount) {
         printf("There are currently no tasks. Enter 'add' to begin adding some.\n"); 
         return;
     }
-    printf("\n-------------------------- Task  list --------------------------\n");  
+    printf("-------------------------- Task  list --------------------------\n");  
     printf("%7s%6s%23s%13s%15s\n", "ID", "Name", "Power", "Duration", "Energy usage");    
     for (i = 0; i < TASK_AMOUNT_MAX; i++) {
         if (strcmp(task_list[i].name, EMPTY_TASK_NAME) != 0) {
@@ -135,7 +88,8 @@ void Initialize_Tasks (task *task_list, int *task_amount) {
 /* Gets task details from the user and adds it to the input array */
 void Add_Task (task *task_list, int *task_amount) {
     task result;
-    char name[TASK_NAME_MAX];
+    char name[TASK_NAME_MAX],
+         temp[TASK_NAME_MAX];
     int power = 0, duration = 0;
 
     if (*task_amount >= TASK_AMOUNT_MAX) {
@@ -143,13 +97,17 @@ void Add_Task (task *task_list, int *task_amount) {
         return;
     }
     
-    printf("\nTask name (max %d): ", TASK_NAME_MAX);
+    printf("Task name (max %d): ", TASK_NAME_MAX);
     fgets(name, TASK_NAME_MAX, stdin);
-    strtok(name, "\n"); /* fjern lorte newline */
+    strtok(name, "\n");
+    
     printf("Power usage (watts): ");
-    scanf(" %d", &power);
+    fgets(temp, TASK_NAME_MAX, stdin);
+    sscanf(temp, " %d", &power);
+
     printf("Task duration (min): ");
-    scanf(" %d", &duration);    
+    fgets(temp, TASK_NAME_MAX, stdin);
+    sscanf(temp, " %d", &duration);
 
     if(!strcmp(name, EMPTY_TASK_NAME) || power <= 0 || duration <= 0) {
         printf("Error in user input, cancelling...\n"); 
@@ -180,6 +138,7 @@ void Remove_Task (task *task_list, int *task_amount, int id) {
     strcpy(result.name, EMPTY_TASK_NAME);
     result.power = 0;
     result.duration = 0;
+    result.kWh = 0.0;
 
     task_list[id - 1] = result;
     *task_amount -= 1;

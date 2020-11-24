@@ -11,7 +11,6 @@ struct task {
 };
 typedef struct task task;
 
-void Print_Help (void);
 void Initialize_Tasks(task *, int *);
 int Load_Tasks (task *, int *);
 int Save_Tasks (task *, int);
