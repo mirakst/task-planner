@@ -9,7 +9,7 @@
 /* Returns price of hours sorted, as double values. */
 void Calculate_Prices (double prices[][2]) {
     char str[13];
-    FILE *fp = fopen(filename, "r");
+    FILE *fp = fopen(PRICES_FILE, "r");
 
     if (fp == NULL) {
         printf("Error opening file '%s'.\n", filename);
