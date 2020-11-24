@@ -10,15 +10,15 @@ typedef enum command command;
 void string_to_lower(char *);
 int compare_command(char *);
 
-struct User_Details {
+typedef struct User_Details {
     int available_schedule[24][1];
     char user_name [100];
-};
-typedef struct User_Details User;
+}User;
 
-void Get_Name (User *);
-void Get_available_Hours (int time[][1]);
-void Save_To_File (User User);
+
+void Get_Name (User *, int *);
+void Get_available_Hours (int time[][1], int *);
+void Save_To_File (User User, int, int);
 
 
 int main (void) {
@@ -46,21 +46,15 @@ int main (void) {
                 break;
 
             case name:
-                Get_Name (&user);
-                printf("Hello %s\n", user.user_name);
-                bool_name = 1;
+                Get_Name (&user, &bool_name);
                 break;
 
             case hours:
-                Get_available_Hours (user.available_schedule);
-                bool_hours = 1;
+                Get_available_Hours (user.available_schedule, &bool_hours);
                 break;
 
             case save:
-                if (bool_hours == 1 && bool_name == 1) 
-                    Save_To_File(user);
-                else 
-                    printf("You have to set a name and time of unavailability to save\n");
+                Save_To_File(user, bool_name, bool_hours);
                 break;
 
             default:
@@ -97,51 +91,69 @@ int compare_command (char *str) {
 }
 
 /* Takes the name of the user */
-void Get_Name (User *user) {
+void Get_Name (User *user, int *bool_name) {
 
     printf("Please enter your name: ");
     scanf("%s", user->user_name);
-
+    printf("Hello %s\n", user->user_name);
+    *bool_name = 1;
 }
 
 /* Adds the available times to an array for easy access */
-void Get_available_Hours (int time[][1]) {
+void Get_available_Hours (int time[][1], int *bool_hours) {
     int i;
     int start_time, end_time;
 
     printf("Enter an interval where you're unavailable between 0 and 23: ");
     scanf("%d %d", &start_time, &end_time);
 
+    /* For loop setting every hour to 0 on first run */
+    if (*bool_hours == 0) {
+        for (i = 0; i < 24; i++) {
+            time[i][0] = 0;
+        }
+    }
+
+    /* For loop setting the boolean array for the hours */
     for (i = 0; i < 24; i++) {
         /* Wrap time if the interval goes from one day to another */
         if (start_time >= end_time) {
-            if (i >= start_time && i < 24 || i <= end_time && i >= 0) {
+            if ((i >= start_time && i < 24) || (i <= end_time && i >= 0)) {
                 time[i][0] = 1;
             }
-            else time[i][0] = 0;
         }
         
         /* Sets the boolean to true if i is in the interval */
         if (start_time <= end_time) {
             if (i >= start_time && i <= end_time) {
                 time[i][0] = 1;
-            }
-            else time[i][0] = 0;
+            } 
         }
     }
+
+    /* boolean keeping track of whether the hours have been set */
+    *bool_hours = 1;
 }
 
-void Save_To_File (User user) {
+void Save_To_File (User user, int bool_name, int bool_hours) {
+    /* If both a name and unavailable hours have been set the user can save their settings */
+    if (bool_hours == 1 && bool_name == 1) {
     int i = 0;
     FILE *p_File;
-
     p_File = fopen("User_Details.txt", "w");
     fprintf(p_File, "%s\n", user.user_name);
 
+    /* The 24 hours in the day and their boolean value*/
     for (i = 0; i < 24; i++) {
         fprintf(p_File, "%d-%d\n", i, user.available_schedule[i][0]);
     }
 
     fclose(p_File);
     printf("Finished saving...\n");
+    }
+
+    /* If a name or available hours hasn't been set it shouldn't be able to save */
+    else {
+        printf("You have to set a name and time of unavailability to save.\n");
+    }
 }
