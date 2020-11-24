@@ -4,7 +4,7 @@
 #include <ctype.h>
 #define INPUT_MAX 20
 
-enum command {cmd_exit, cmd_help, name, hours, save, cmd_unrecognized};
+enum command {cmd_exit, cmd_help, name, hours, reset, save, cmd_unrecognized};
 typedef enum command command;
 
 void string_to_lower(char *);
@@ -15,11 +15,10 @@ typedef struct User_Details {
     char user_name [100];
 }User;
 
-
 void Get_Name (User *, int *);
+void Reset_available_Hours (int time[][1]);
 void Get_available_Hours (int time[][1], int *);
-void Save_To_File (User User, int, int);
-
+void Save_To_File (User, int, int);
 
 int main (void) {
     User user;
@@ -53,6 +52,10 @@ int main (void) {
                 Get_available_Hours (user.available_schedule, &bool_hours);
                 break;
 
+            case reset:
+                Reset_available_Hours (user.available_schedule);
+                break;
+
             case save:
                 Save_To_File(user, bool_name, bool_hours);
                 break;
@@ -84,6 +87,8 @@ int compare_command (char *str) {
         return name;
     else if (!strcmp(str, "hours"))
         return hours;
+    else if (!strcmp(str, "reset"))
+        return reset;
     else if (!strcmp(str, "save"))
         return save;
     else
@@ -97,6 +102,13 @@ void Get_Name (User *user, int *bool_name) {
     scanf("%s", user->user_name);
     printf("Hello %s\n", user->user_name);
     *bool_name = 1;
+}
+
+void Reset_available_Hours (int time[][1]) {
+    int i;
+    for (i = 0; i < 24; i++) {
+        time[i][0] = 0;
+    }
 }
 
 /* Adds the available times to an array for easy access */
@@ -116,15 +128,22 @@ void Get_available_Hours (int time[][1], int *bool_hours) {
 
     /* For loop setting the boolean array for the hours */
     for (i = 0; i < 24; i++) {
+        
+        /* If the start and end time is the same */
+        if (start_time == end_time) {
+            time[start_time][0] = 1;
+            break;
+        }
+
         /* Wrap time if the interval goes from one day to another */
-        if (start_time >= end_time) {
+        else if (start_time > end_time) {
             if ((i >= start_time && i < 24) || (i <= end_time && i >= 0)) {
                 time[i][0] = 1;
             }
         }
         
         /* Sets the boolean to true if i is in the interval */
-        if (start_time <= end_time) {
+        else if (start_time < end_time) {
             if (i >= start_time && i <= end_time) {
                 time[i][0] = 1;
             } 
