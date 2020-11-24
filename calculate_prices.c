@@ -2,10 +2,6 @@
 #include <stdlib.h>
 #include "calculate_prices.h"
 
-#define HOURS_PR_DAY 24
-#define PRICES_FILE "prices.txt"
-
-
 /* Returns price of hours sorted, as double values. */
 void Calculate_Prices (double prices[][2]) {
     char str[13];
