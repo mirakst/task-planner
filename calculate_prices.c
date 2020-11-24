@@ -3,14 +3,13 @@
 #include "calculate_prices.h"
 
 #define HOURS_PR_DAY 24
+#define filename "prices.txt"
 
 
 /* Returns price of hours sorted, as double values. */
 void Calculate_Prices (double prices[][2]) {
-    char str[13],
-         filename[11] = "prices.txt";
+    char str[13];
     FILE *fp = fopen(filename, "r");
-    int i;
 
     if (fp == NULL) {
         printf("Error opening file '%s'.\n", filename);
@@ -19,15 +18,15 @@ void Calculate_Prices (double prices[][2]) {
 
     Load_Prices (str, fp, prices);
     qsort(prices, HOURS_PR_DAY, 2*(sizeof(double)), Double_Compare);
-    
-    return;
 }
 
 /* A comparing function for qsort, typecasting input to doubles */
 int Double_Compare (const void *x, const void *y) {
   double xx = *(double*)x, yy = *(double*)y;
-  if (xx < yy) return -1;
-  if (xx > yy) return  1;
+  if (xx < yy) 
+      return -1;
+  if (xx > yy) 
+      return  1;
   return 0;
 }
 
@@ -41,5 +40,4 @@ void Load_Prices (char* str, FILE *fp, double prices[][2]) {
         prices[i][1] = i;
         prices[i][0] = strtod(str, NULL);
     }
-    return;
 }
