@@ -12,7 +12,7 @@ void Calculate_Prices (double prices[][2]) {
     FILE *fp = fopen(PRICES_FILE, "r");
 
     if (fp == NULL) {
-        printf("Error opening file '%s'.\n", filename);
+        printf("Error opening file '%s'.\n", PRICES_FILE);
         return;
     }
 
