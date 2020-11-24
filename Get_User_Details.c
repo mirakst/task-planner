@@ -78,20 +78,21 @@ void Get_Available_Hours (int time[][1], int *bool_hours) {
 }
 
 void Save_User_Details (User user, int bool_name, int bool_hours) {
-    /* If both a name and unavailable hours have been set the user can save their settings */
-    if (bool_hours == 1 && bool_name == 1) {
     int i = 0;
     FILE *p_File;
     p_File = fopen(FILE_USER_DETAILS, "w");
-    fprintf(p_File, "%s\n", user.user_name);
+    
+    /* If both a name and unavailable hours have been set the user can save their settings */
+    if (bool_hours == 1 && bool_name == 1) {
+        fprintf(p_File, "%s\n", user.user_name);
 
-    /* The 24 hours in the day and their boolean value*/
-    for (i = 0; i < 24; i++) {
-        fprintf(p_File, "%d-%d\n", i, user.available_schedule[i][0]);
-    }
+        /* The 24 hours in the day and their boolean value*/
+        for (i = 0; i < 24; i++) {
+            fprintf(p_File, "%d-%d\n", i, user.available_schedule[i][0]);
+        }
 
-    fclose(p_File);
-    printf("Finished saving...\n");
+        fclose(p_File);
+        printf("Finished saving...\n");
     }
 
     /* If a name or available hours hasn't been set it shouldn't be able to save */
