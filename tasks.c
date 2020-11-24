@@ -85,7 +85,7 @@ int Load_Tasks (task *task_list, int *task_amount) {
     
     while (fgets(temp_string, 50, fp) && *task_amount < TASK_AMOUNT_MAX) {
         sscanf(temp_string, " %*s %[^,] %*c %*s %d %*c %*s %d",
-                            task_name, &task_power, &task_duration);
+               task_name, &task_power, &task_duration);
     
         strcpy(task_list[*task_amount].name, task_name);
         task_list[*task_amount].power = task_power;
@@ -114,7 +114,7 @@ int Save_Tasks (task *task_list, int task_amount) {
     Sort_Task_List(task_list);
     for (i = 0; i < task_amount; i++) {
         fprintf(fp, "name: %s, power: %d, duration: %d\n",
-                    task_list[i].name, task_list[i].power, task_list[i].duration);
+                task_list[i].name, task_list[i].power, task_list[i].duration);
     }
 
     fclose(fp);
