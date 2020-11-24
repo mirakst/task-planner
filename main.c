@@ -24,7 +24,7 @@ typedef enum command {cmd_exit, cmd_help, cmd_help_tasks,
 void String_To_Lower(char*);
 int Compare_Command(char*);
 void Print_Help (int, int);
-void suggest_Tasks (task*, int, double[HOURS_PR_DAY][2], double[HOURS_PR_DAY][2]);
+void Suggest_Tasks (task*, int, double[HOURS_PR_DAY][2], double[HOURS_PR_DAY][2]);
 int Get_Index_Unsorted (int, double[HOURS_PR_DAY][2], double[HOURS_PR_DAY][2]);
 
 int main (void) {
@@ -42,7 +42,7 @@ int main (void) {
     Initialize_Tasks(task_list, &task_amount);
     file_status = Load_Tasks(task_list, &task_amount);                           
     if (file_status == 1)                                                        
-        printf("Loaded %d tasks successfully.\n", task_amount);                   
+        printf("Fucked anders %d times successfully.\n", task_amount);                   
     else if (file_status == -1)                                                  
         printf("Failed to load task configuration file: %s.\n", FILE_TASKLIST);  
     Calculate_Prices (prices, 0);
@@ -99,7 +99,7 @@ int main (void) {
 
             /* Suggestations */
             case cmd_suggest:
-                suggest_Tasks(task_list, task_amount, prices_sorted, prices);
+                Suggest_Tasks(task_list, task_amount, prices_sorted, prices);
                 break;
 
             default:
@@ -144,18 +144,16 @@ int Compare_Command (char *str) {
     return cmd_unrecognized;
 }
 
-/* suggest a task */
-void suggest_Tasks (task *task_list, int task_amount, double prices_sorted[HOURS_PR_DAY][2], double prices[HOURS_PR_DAY][2]) {
+/* Suggest a task */
+void Suggest_Tasks (task *task_list, int task_amount, double prices_sorted[HOURS_PR_DAY][2], double prices[HOURS_PR_DAY][2]) {
     int i, j, unsorted_index = 0;
     double total_task_price = 0.0, task_price_hr = 0.0, task_hours = 0;
 
     printf("------------------------- Suggestions ---------------------------\n");
-    printf("%s%10s%10s", "Task", "***", "Total price")
+    printf("%-20s%16s%16s\n", "Task", "Starting time", "Total price");
 
-    /* For 1 hr pr task */
     for (i = 0; i < task_amount; i++) {
         task_hours = (double)task_list[i].duration / 60.0;
-        printf("task_hours: %lf\n", task_hours);
 
         task_price_hr = prices_sorted[i][0];
         unsorted_index = Get_Index_Unsorted(i, prices_sorted, prices);
@@ -167,7 +165,7 @@ void suggest_Tasks (task *task_list, int task_amount, double prices_sorted[HOURS
         }
 
         total_task_price = task_price_hr * ((double)task_list[i].power / 1000.0);
-        printf("%20s: %.0lf %.3lf", task_list[i].name, prices_sorted[i][1], total_task_price);
+        printf("%-20s %15.2d %11.3f DKK\n", task_list[i].name, (int) prices_sorted[i][1], total_task_price);
     }
     printf("----------------------------------------------------------------\n");
 }
