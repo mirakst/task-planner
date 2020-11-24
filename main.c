@@ -5,49 +5,59 @@
  * Studieretning: Software 
  */
 
-/* Standard libraries */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
-/* Custom libraries */
-#include "lib/tasks.h"
-#include "lib/calculate_prices.h"
-#include "lib/user_details.h"
+/* TODO:
+ * FLERE STREGER!
+ * Make function "suggest tasks" in another file
+ * Make function "help" in another file!
+ * Add function for initialization/loading and saving
+*/
 
-#define INPUT_MAX 40
+#include "main.h"
 
-typedef enum command {cmd_exit, cmd_help, cmd_help_tasks, 
-                      cmd_help_prices, cmd_prices, cmd_prices_sorted, cmd_list_tasks, 
-                      cmd_task_add, cmd_task_remove, cmd_suggest, cmd_unrecognized} command;
-
-void String_To_Lower(char*);
-int Compare_Command(char*);
-void Print_Help (int, int);
-void Suggest_Tasks (task*, int, double[HOURS_PR_DAY][2], double[HOURS_PR_DAY][2]);
-int Get_Index_Unsorted (int, double[HOURS_PR_DAY][2], double[HOURS_PR_DAY][2]);
-
-int main (void) {
+/* Main program function */
+int main (int argc, char *argv[]) {
+    User user;
     char cmd_input[INPUT_MAX];
     double prices[HOURS_PR_DAY][2],
            prices_sorted[HOURS_PR_DAY][2];
     task task_list[TASK_AMOUNT_MAX]; 
-    int task_amount = 0, 
+    int debug = 0,
+        task_amount = 0, 
         task_id = 0,
         cmd = 0,
-        i,
-        file_status = 0;
+        file_status = 0,
+        bool_hours = 0,
+        bool_name = 0;
     
+    /* Check for -debug input argument */
+    if (argc == 2 && (strcmp(argv[1], "-debug") == 0))
+        debug = 1;
+
     /* Initialization */
-    Initialize_Tasks(task_list, &task_amount);
-    file_status = Load_Tasks(task_list, &task_amount);                           
-    if (file_status == 1)                                                        
-        printf("Fucked anders %d times successfully.\n", task_amount);                   
-    else if (file_status == -1)                                                  
-        printf("Failed to load task configuration file: %s.\n", FILE_TASKLIST);  
-    Calculate_Prices (prices, 0);
+    file_status = Calculate_Prices (prices, 0);
+    if(file_status == -1) {
+        printf("Exiting.\n");
+        exit(EXIT_FAILURE);
+    }
     Calculate_Prices (prices_sorted, 1);
+
+    /* Attempt to load user details. Starts setup if there is no file */
+    file_status = Load_User_Details(&user);
+    if(file_status == -1) {
+        First_Time_Setup (&user, &bool_hours, &bool_name);
+        Save_User_Details(user, bool_name, bool_hours);
+    }
+    else {
+        bool_hours = 1;
+        bool_name = 1;
+    }
+
+    Initialize_Tasks(task_list, &task_amount);
+    file_status = Load_Tasks(task_list, &task_amount);
+    if (file_status == 1)
+        printf("Loaded %d tasks successfully.\n", task_amount);
+    else if (file_status == -1)
+        printf("Failed to load task configuration file: %s.\n", FILE_TASKLIST);
 
     do {
         /* Get user input and convert to lower case letters */
@@ -57,7 +67,8 @@ int main (void) {
         String_To_Lower(cmd_input);
         cmd = Compare_Command(cmd_input);
         
-        printf("[DEBUG]: cmd = %d: %s\n", cmd, cmd_input); /* For debugging */
+        if(debug)
+            printf("[DEBUG]: cmd = %d: %s\n", cmd, cmd_input);
         
         /* Run the appropriate function based on the command */
         switch (cmd) {
@@ -78,6 +89,26 @@ int main (void) {
                 Print_Help(cmd, 0);
                 break;
 
+            /* User details */
+            case cmd_list_settings:
+                Print_User_Details(user);
+                break;
+            case cmd_availability:
+                Set_Available_Hours(user.available_schedule, &bool_hours);
+                break;
+            case cmd_reset_hours:
+                Reset_Available_Hours(user.available_schedule);
+                break;
+            case cmd_save_user_details:
+                file_status = Save_User_Details(user, bool_hours, bool_name);
+                if (file_status == -1)
+                    printf("Failed to save user details.\n");
+                else if (file_status == 0)
+                    printf("You have to set a name and time of availability to save.\n");
+                else
+                    printf("Saved user details succesfully.\n");
+                break;
+                
             /* Prices */
             case cmd_prices:
                 List_Prices (prices);
@@ -100,7 +131,7 @@ int main (void) {
 
             /* Suggestations */
             case cmd_suggest:
-                Suggest_Tasks(task_list, task_amount, prices_sorted, prices);
+                Suggest_Tasks(user, task_list, task_amount, prices_sorted, prices);
                 break;
 
             default:
@@ -110,14 +141,13 @@ int main (void) {
 
     } while (cmd != cmd_exit);
 
-    Save_Tasks(task_list, task_amount);
-    return EXIT_SUCCESS;
-}
+    file_status = Save_User_Details(user, bool_name, bool_hours);
+    if (file_status == -1)
+        printf("Failed to save user details.\n");
 
-void String_To_Lower(char *str) {
-    int i;
-    for (i = 0; i < INPUT_MAX; i++)
-        str[i] = tolower(str[i]);
+    Save_Tasks(task_list, task_amount);
+
+    return EXIT_SUCCESS;
 }
 
 int Compare_Command (char *str) {
@@ -133,8 +163,16 @@ int Compare_Command (char *str) {
         return cmd_prices_sorted;
     if (!strcmp(str, "list tasks\n"))
         return cmd_list_tasks;
+    if (!strcmp(str, "list settings\n"))
+        return cmd_list_settings;
+    if (!strcmp(str, "set hours\n"))
+        return cmd_availability;
     if (!strcmp(str, "task add\n"))
         return cmd_task_add;
+    if (!strcmp(str, "reset hours\n"))
+        return cmd_reset_hours;
+    if (!strcmp(str, "save settings\n"))
+        return cmd_save_user_details;
     if (strstr(str, "task remove"))
         return cmd_task_remove;
     if (!strcmp(str, "suggest\n"))
@@ -146,18 +184,23 @@ int Compare_Command (char *str) {
 }
 
 /* Suggest a task */
-void Suggest_Tasks (task *task_list, int task_amount, double prices_sorted[HOURS_PR_DAY][2], double prices[HOURS_PR_DAY][2]) {
+void Suggest_Tasks (User user, task *task_list, int task_amount, double prices_sorted[HOURS_PR_DAY][2], double prices[HOURS_PR_DAY][2]) {
     int i, j, unsorted_index = 0;
     double total_task_price = 0.0, task_price_hr = 0.0, task_hours = 0;
 
-    printf("------------------------- Suggestions ---------------------------\n");
+    Print_Line(1, "Suggestions list");
     printf("%-20s%16s%16s\n", "Task", "Starting time", "Total price");
 
     for (i = 0; i < task_amount; i++) {
         task_hours = (double)task_list[i].duration / 60.0;
+        unsorted_index = Get_Index_Unsorted(i, prices_sorted, prices);
+
+        printf("index: %d, user availability: %d\n", unsorted_index, user.available_schedule[unsorted_index]);
+        while (user.available_schedule[unsorted_index] != 1) {
+            unsorted_index++;
+        }
 
         task_price_hr = prices_sorted[i][0];
-        unsorted_index = Get_Index_Unsorted(i, prices_sorted, prices);
 
         for (j = 1; j < task_hours; j++) {
             task_price_hr += prices[unsorted_index + j][0];
@@ -168,9 +211,8 @@ void Suggest_Tasks (task *task_list, int task_amount, double prices_sorted[HOURS
         total_task_price = task_price_hr * ((double)task_list[i].power / 1000.0);
         printf("%-20s %15.2d %11.3f DKK\n", task_list[i].name, (int) prices_sorted[i][1], total_task_price);
     }
-    printf("----------------------------------------------------------------\n");
+    Print_Line(0,"");
 }
-
 
 /* Takes an index from the sorted array and returns its index in the unsorted array */
 int Get_Index_Unsorted (int sorted_index, double prices_sorted[HOURS_PR_DAY][2], double prices[HOURS_PR_DAY][2]) {
@@ -186,7 +228,7 @@ int Get_Index_Unsorted (int sorted_index, double prices_sorted[HOURS_PR_DAY][2],
 
 /* Prints available commands based on the input */
 void Print_Help (int cmd, int print_all) {
-    printf("-------------------------- Commands ----------------------------\n");
+    Print_Line(1, "Commands");
     switch (cmd) {
     case cmd_help_tasks:
         printf("%-13s -- Lists all tasks.\n", "List tasks");
@@ -200,5 +242,5 @@ void Print_Help (int cmd, int print_all) {
         if(!print_all)
             break;
     }
-    printf("----------------------------------------------------------------\n");
+    Print_Line(0,"");
 }

@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tasks.h"
+#include "graphics.h"
 
 /* Prints a list of all non-empty tasks */
 void Print_Task_List (task *task_list, int task_amount) {
@@ -15,7 +16,8 @@ void Print_Task_List (task *task_list, int task_amount) {
         printf("There are currently no tasks. Enter 'add' to begin adding some.\n"); 
         return;
     }
-    printf("-------------------------- Task  list --------------------------\n");  
+
+    Print_Line(1, "Tasklist");
     printf("%7s%6s%23s%13s%15s\n", "ID", "Name", "Power", "Duration", "Energy usage");    
     for (i = 0; i < TASK_AMOUNT_MAX; i++) {
         if (strcmp(task_list[i].name, EMPTY_TASK_NAME) != 0) {
@@ -23,7 +25,7 @@ void Print_Task_List (task *task_list, int task_amount) {
                     task_list[i].name, task_list[i].power, task_list[i].duration, task_list[i].kWh);
         }
     }
-    printf("----------------------------------------------------------------\n");
+    Print_Line(0, "");
 }
 
 /* Loads tasks from the config file. Returns 0 if nothing is loaded */

@@ -3,18 +3,20 @@
 #include "calculate_prices.h"
 
 /* Returns price of hours sorted, as double values. */
-void Calculate_Prices (double prices[][2], int sort) {
+int Calculate_Prices (double prices[][2], int sort) {
     char str[13];
     FILE *fp = fopen(PRICES_FILE, "r");
 
     if (fp == NULL) {
         printf("Error opening file '%s'.\n", PRICES_FILE);
-        return;
+        return -1;
     }
 
     Load_Prices (str, fp, prices);
     if (sort)
         qsort(prices, HOURS_PR_DAY, 2*(sizeof(double)), Double_Compare);
+
+    return 1;
 }
 
 /* A function that fetches 24 lines worth of prices from file fp, 
