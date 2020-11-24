@@ -12,7 +12,7 @@ int main (void) {
 Get_Name (&user, &bool_name);
 Get_available_Hours (user.available_schedule, &bool_hours);
 Reset_available_Hours (user.available_schedule);
-Save_To_File(user, bool_name, bool_hours);
+Save_User_Details(user, bool_name, bool_hours);
 */
 
 /* Takes the name of the user */
@@ -77,7 +77,7 @@ void Get_Available_Hours (int time[][1], int *bool_hours) {
     *bool_hours = 1;
 }
 
-void Save_To_File (User user, int bool_name, int bool_hours) {
+void Save_User_Details (User user, int bool_name, int bool_hours) {
     /* If both a name and unavailable hours have been set the user can save their settings */
     if (bool_hours == 1 && bool_name == 1) {
     int i = 0;
