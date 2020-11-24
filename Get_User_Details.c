@@ -30,7 +30,7 @@ void Reset_Available_Hours (int time[][1]) {
     for (i = 0; i < 24; i++) {
         time[i][0] = 0;
     }
-    printf("Reset complete\n")
+    printf("Reset complete\n");
 }
 
 /* Adds the available times to an array for easy access */
