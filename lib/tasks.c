@@ -93,7 +93,7 @@ void Add_Task (task *task_list, int *task_amount) {
     int power = 0, duration = 0;
 
     if (*task_amount >= TASK_AMOUNT_MAX) {
-        printf("The maximum amount of tasks has been reached.\n");
+        printf("The maximum amount of tasks has been added.\n");
         return;
     }
     
@@ -103,11 +103,13 @@ void Add_Task (task *task_list, int *task_amount) {
     
     printf("Power usage (watts): ");
     fgets(temp, TASK_NAME_MAX, stdin);
-    sscanf(temp, " %d", &power);
+    if(sscanf(temp, " %d", &power) == 0)
+        return;
 
     printf("Task duration (min): ");
     fgets(temp, TASK_NAME_MAX, stdin);
-    sscanf(temp, " %d", &duration);
+    if(sscanf(temp, " %d", &duration) == 0)
+        return;
 
     if(!strcmp(name, EMPTY_TASK_NAME) || power <= 0 || duration <= 0) {
         printf("Error in user input, cancelling...\n"); 

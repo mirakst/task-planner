@@ -1,4 +1,4 @@
-#define FILE_USER_DETAILS "User_Details.txt"
+#define FILE_USER_DETAILS "user_details.txt"
 
 typedef struct User_Details {
     int available_schedule[24][1];

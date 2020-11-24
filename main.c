@@ -12,8 +12,9 @@
 #include <ctype.h>
 #include <math.h>
 /* Custom libraries */
-#include "tasks.h"
-#include "calculate_prices.h"
+#include "lib/tasks.h"
+#include "lib/calculate_prices.h"
+#include "lib/user_details.h"
 
 #define INPUT_MAX 40
 

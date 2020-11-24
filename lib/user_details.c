@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "Get_User_Details.h"
+#include "user_details.h"
 
 /* Append in main.c
 int main (void) {
@@ -90,12 +90,9 @@ void Save_User_Details (User user, int bool_name, int bool_hours) {
         for (i = 0; i < 24; i++) {
             fprintf(p_File, "%d-%d\n", i, user.available_schedule[i][0]);
         }
-
         fclose(p_File);
         printf("Finished saving...\n");
-    }
-
-    /* If a name or available hours hasn't been set it shouldn't be able to save */
+    } /* If a name or available hours hasn't been set it shouldn't be able to save */
     else {
         printf("You have to set a name and time of unavailability to save.\n");
     }

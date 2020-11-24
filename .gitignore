@@ -1,7 +1,8 @@
 .vscode/tasks.json
-calculate_prices
-main
-test
+test.c
 tasks.o
-tasklist
-prices
+tasklist.txt
+prices.txt
+a.exe
+README.md
+protype-code\
