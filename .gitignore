@@ -1,3 +1,7 @@
 .vscode/tasks.json
 calculate_prices
 main
+test
+tasks.o
+tasklist
+prices
