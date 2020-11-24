@@ -19,7 +19,7 @@ Save_User_Details(user, bool_name, bool_hours);
 void Get_Name (User *user, int *bool_name) {
 
     printf("Please enter your name: ");
-    scanf("%s", user->user_name);
+    gets(user->user_name);
     printf("Hello %s\n", user->user_name);
     *bool_name = 1;
 }
