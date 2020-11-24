@@ -3,7 +3,7 @@
 #include "calculate_prices.h"
 
 #define HOURS_PR_DAY 24
-#define filename "prices.txt"
+#define PRICES_FILE "prices.txt"
 
 
 /* Returns price of hours sorted, as double values. */
