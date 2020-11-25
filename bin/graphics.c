@@ -189,14 +189,6 @@ void Print_Line(int has_word, char *word) {
 
 
 
-
-
-
-
-
-
-
-
 /* wtf */
 void Print_Square(void) {
     printf("\n\n\n");

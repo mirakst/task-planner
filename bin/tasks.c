@@ -84,6 +84,7 @@ void Initialize_Tasks (task *task_list, int *task_amount) {
         task_list[i].power = 0;
         task_list[i].duration = 0; 
         task_list[i].kWh = 0.0;
+        task_list[i].bool_is_active = 1;
     }
 }
 
