@@ -8,6 +8,7 @@ struct task {
     int power;
     int duration;
     double kWh;
+    int bool_is_active;
 };
 typedef struct task task;
 
