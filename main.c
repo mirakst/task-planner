@@ -102,10 +102,12 @@ void Initialize(double prices[][2], double prices_sorted[][2], User *user, task 
     user->bool_name = 0;
 
     file_status = Load_User_Details(user);
-    if (file_status == -1) {
+    if (file_status != 1) {
         First_Time_Setup(user);
         Save_User_Details(*user);
     }
+    user->bool_hours = file_status;
+    user->bool_name = file_status;
 
     /* Attempts to load tasks from tasklist file */
     Initialize_Tasks(task_list, task_amount);
@@ -118,7 +120,7 @@ void Initialize(double prices[][2], double prices_sorted[][2], User *user, task 
 
 /* Saves the user details and task list */
 void Save(User user, task task_list[TASK_AMOUNT_MAX], int task_amount) {
-    if (Save_User_Details(user) == -1) {
+    if (Save_User_Details(user) != 1) {
         printf("Failed to save user settings.\n");
         return;
     }

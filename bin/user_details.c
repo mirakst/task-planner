@@ -80,7 +80,7 @@ void Print_Settings (User user) {
     int i;
     
     Print_Line(1, "Settings");
-    printf("User: %s\n", user.user_name);
+    printf("Username: %s\n", user.user_name);
     printf("Ignore available hours: %s\n\n", user.bool_ignore_hours ? "Yes" : "No");
     Print_Line(1, "Availability");
 
@@ -99,7 +99,7 @@ void Print_Settings (User user) {
 
 /* Attempts to load user details from file */
 int Load_User_Details (User *user) {
-    char chunk[100];
+    char temp_string[100];
     int i = 0;
     FILE *fp;
 
@@ -108,16 +108,16 @@ int Load_User_Details (User *user) {
         return -1;
 
     for (i = 0; i < HOURS_PER_DAY + 2; i++) {
-        fgets(chunk, 100, fp);
-        
-        if (i == 0)
-            sscanf(chunk, " %[^\n]", user->user_name);
-        else if (i != 0 && i < 26)
-            sscanf(chunk, " %*d %*c %d", &user->available_hours[i - 1]);
+        fgets(temp_string, 100, fp);
+
+        if (i == 0) 
+            sscanf(temp_string, " %*[^:] %*c %[^\n]", user->user_name);
+        else if (i == 1)
+            sscanf(temp_string, " %*[^:] %*c %d", &user->bool_ignore_hours);
         else
-            sscanf(chunk, "%d", &user->bool_ignore_hours);
-    }
-    
+            sscanf(temp_string, " %*d %*c %d", &user->available_hours[i - 2]);
+        }
+
     fclose(fp);
     return 1;
 }
@@ -133,14 +133,12 @@ int Save_User_Details (User user) {
     p_File = fopen(FILE_USER_DETAILS, "w");
     if(p_File == NULL)
         return -1;
+    printf("%s\n", user.user_name);
+    fprintf(p_File, "Username: %s\n", user.user_name);
+    fprintf(p_File, "Ignore hours: %d\n", user.bool_ignore_hours);
     
-    fprintf(p_File, "%s\n", user.user_name);
-
-    for (i = 0; i < HOURS_PER_DAY; i++) {
+    for (i = 0; i < HOURS_PER_DAY; i++)
         fprintf(p_File, "%d-%d\n", i, user.available_hours[i]);
-    }
-
-    fprintf(p_File, "%d", user.bool_ignore_hours);
 
     fclose(p_File);
     return 1;
