@@ -14,7 +14,7 @@ int Calculate_Prices (double prices[][2], int sort) {
 
     Load_Prices (str, fp, prices);
     if (sort)
-        qsort(prices, HOURS_PR_DAY, 2*(sizeof(double)), Double_Compare);
+        qsort(prices, HOURS_PER_DAY, 2*(sizeof(double)), Double_Compare);
 
     return 1;
 }
@@ -23,7 +23,7 @@ int Calculate_Prices (double prices[][2], int sort) {
  * then assigns them to numbered 2d array */
 void Load_Prices (char* str, FILE *fp, double prices[][2]) {
     int i;
-    for (i = 0; i < HOURS_PR_DAY; i++) {
+    for (i = 0; i < HOURS_PER_DAY; i++) {
         fgets(str, 13, fp);
         /* printf("[DEBUG] The price fetched is: %s", str); */
         prices[i][1] = i;

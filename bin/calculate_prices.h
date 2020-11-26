@@ -1,4 +1,4 @@
-#define HOURS_PR_DAY 24
+#define HOURS_PER_DAY 24
 #define PRICES_FILE "config/pricelist"
 
 int Double_Compare (const void *, const void *);

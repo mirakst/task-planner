@@ -11,26 +11,27 @@
 #include "bin/graphics.h"
 #include "bin/help.h"
 
-#define INPUT_MAX 40
+#define INPUT_MAX 20
 
 /* Commands */
-#define EXIT "exit\n"
-#define LIST_PRICES "list prices\n"
-#define LIST_PRICES_SORTED "list prices sorted\n"
-#define LIST_TASKS "list tasks\n"
-#define HELP "help\n"
-#define HELP_TASKS "help tasks\n"
-#define HELP_PRICES "help prices\n"
-#define HELP_SETTINGS "help settings\n"
-#define HELP_USER_DETAILS "help user details\n"
-#define ADD_TASK "task add\n"
-#define REMOVE_TASK "task remove"
-#define SUGGEST "suggest\n"
-#define LIST_SETTINGS "list settings\n"
-#define SET_NAME "set name\n"
-#define RESET_HOURS "reset hours\n"
-#define SET_HOURS "set hours\n"
-#define SAVE_USER "save\n"
+#define EXIT                "exit\n"
+#define LIST_PRICES         "list prices\n"
+#define LIST_PRICES_SORTED  "list prices sorted\n"
+#define LIST_TASKS          "task list\n"
+#define HELP                "help\n"
+#define HELP_TASKS          "help task\n"
+#define HELP_PRICES         "help prices\n"
+#define HELP_SETTINGS       "help settings\n"
+#define HELP_USER_DETAILS   "help user details\n"
+#define RECOMMEND           "recommend\n"
+#define ADD_TASK            "task add\n"
+#define REMOVE_TASK         "task remove"
+#define SUGGEST             "suggest\n"
+#define LIST_SETTINGS       "list settings\n"
+#define SET_NAME            "set name\n"
+#define RESET_HOURS         "reset hours\n"
+#define SET_HOURS           "set hours\n"
+#define SAVE_USER           "save\n"
 
 /* Converts the input string to lower case */
 void String_To_Lower(char *str) {
@@ -42,163 +43,6 @@ void String_To_Lower(char *str) {
 void Initialize (double[][2], double[][2], User *, task[TASK_AMOUNT_MAX], int *);
 void Save (User, task[TASK_AMOUNT_MAX], int);
 void Suggest_Tasks (User, task *, int, double[][2], double[][2]);
-double Calculate_Max_Price (double[][2], double[][2], double, task);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void Save_User_Value(void){
-    printf("\nFuck Nikolaj");
-    return;
-}
+double Calculate_Task_Price (int, task, double[][2], double[][2]); 
+double Calculate_Peak_Price (double[][2], double[][2], task);
+double Calculate_Savings_Percent (double, double);
