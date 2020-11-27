@@ -160,7 +160,7 @@ void Find_Lowest_Price (User user, task *p_task, double p[][2]) {
         if (!p_task->bool_is_passive) {
             for (j = i; j != end_hr; j++) {
                 j = Wrap_Hour(j);
-                if (!user.available_hours[j] && !user.available_hours[end_hr]) {
+                if (!user.available_hours[j]) {
                     skip_hr = 1;
                     price = 0.0;
                     break;
