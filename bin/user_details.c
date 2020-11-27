@@ -43,7 +43,12 @@ void Set_Available_Hours (User *user) {
     fgets(temp_string, 10, stdin);
     sscanf(temp_string, " %d %d", &start_time, &end_time);
 
-    /* For loop setting every hour to 0 on first r un */
+    if ((start_time > HOURS_PER_DAY || start_time < 0) || (end_time > HOURS_PER_DAY || end_time < 0)) {
+        printf("FUCK!");
+        return;
+    }
+
+    /* For loop setting every hour to 0 on first run */
     if (!user->bool_hours) {
         for (i = 0; i < HOURS_PER_DAY; i++)
             user->available_hours[i] = 0;
@@ -133,7 +138,6 @@ int Save_User_Details (User user) {
     p_File = fopen(FILE_USER_DETAILS, "w");
     if(p_File == NULL)
         return -1;
-    printf("%s\n", user.user_name);
     fprintf(p_File, "Username: %s\n", user.user_name);
     fprintf(p_File, "Ignore hours: %d\n", user.bool_ignore_hours);
     
@@ -157,5 +161,51 @@ void Set_Ignore_Hours(User *user) {
         user->bool_ignore_hours = 1;
     else
         user->bool_ignore_hours = 0;
-    printf("Setting have been saved succesfully.\n");
+    printf("Set tings have been saved succesfully.\n");
+}
+
+/* Settings menu */
+void Acclimation_Index(User *user) {
+    int input = 0;
+    char temp_string[5];
+
+    Print_Line(1, "Settings");
+    printf("1: %-20s\n", "Show current settings");
+    printf("2: %-20s\n", "Change name");
+    printf("3: %-20s\n", "Set available hours");
+    printf("4: %-20s\n", "Reset available hours");
+    printf("5: %-20s\n", "Save user settings");
+    printf("6: %-20s\n", "Set ignore hours");
+    printf("0: %-20s\n", "Exit");
+    Print_Line(0, "");
+
+    printf("Choose a setting (nikolaj sutter pik): ");
+    fgets(temp_string, 5, stdin);
+    sscanf(temp_string, " %d", &input);
+    
+    switch (input) {
+    case 0:
+        return;
+        break;
+    case 1:
+        Print_Settings(*user);
+        break;
+    case 2:
+        Get_Name(user);
+        break;
+    case 3:
+        Set_Available_Hours(user);
+        break;
+    case 4:
+        Reset_Available_Hours(user->available_hours);
+        break;
+    case 5:
+        Save_User_Details(*user);
+        break;
+    case 6:
+        Set_Ignore_Hours(user);
+        break;
+    default:
+        return;
+    }
 }

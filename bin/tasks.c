@@ -21,11 +21,12 @@ void Print_Task_List (task *task_list, int task_amount) {
     printf("%7s%6s%23s%13s%15s%8s\n", "ID", "Name", "Power", "Duration", "Energy usage", "Status");
     for (i = 0; i < TASK_AMOUNT_MAX; i++) {
         if (strcmp(task_list[i].name, EMPTY_TASK_NAME) != 0) {
-            printf("Task %2d: %-20s %4d W %8d min %10.3f kWh %7c\n", (i + 1),
+            printf("Task %2d: %-20s %4d W %8.1f hrs %10.3f kWh %7c\n", 
+                    (i + 1),
                     task_list[i].name, 
                     task_list[i].power,
-                    task_list[i].duration_min, 
-                    task_list[i].kW / task_list[i].duration_hrs, 
+                    task_list[i].duration, 
+                    task_list[i].kW * task_list[i].duration, 
                     task_list[i].bool_is_passive == 1 ? 'P' : 'A');
         }
     }
@@ -42,13 +43,12 @@ int Load_Tasks (task *task_list, int *task_amount) {
         return -1;
     
     while (fgets(temp_string, READ_LINE_MAX, fp) && *task_amount < TASK_AMOUNT_MAX) {
-        sscanf(temp_string, " %*s %[^,] %*c %*s %d %*c %*s %d %*c %*s %d",
+        sscanf(temp_string, " %*s %[^,] %*c %*s %d %*c %*s %lf %*c %*s %d",
                task_list[*task_amount].name,
                &task_list[*task_amount].power,
-               &task_list[*task_amount].duration_min,
+               &task_list[*task_amount].duration,
                &task_list[*task_amount].bool_is_passive);
     
-        task_list[*task_amount].duration_hrs = Calculate_Hours(task_list[*task_amount]);
         task_list[*task_amount].kW = Calculate_kW(task_list[*task_amount]);
         *task_amount += 1;
     }
@@ -62,10 +62,6 @@ int Load_Tasks (task *task_list, int *task_amount) {
 /* Returns the kW usage of the input task */
 double Calculate_kW (task task) {
     return (double)task.power / W_PER_KW;
-}
-
-double Calculate_Hours (task task) {
-    return (double)task.duration_min / MIN_PER_HOUR;
 }
 
 /* Saves all tasks to the config file. Returns 0 if nothing is saved */
@@ -82,8 +78,8 @@ int Save_Tasks (task *task_list, int task_amount) {
 
     Sort_Task_List(task_list);
     for (i = 0; i < task_amount; i++) {
-        fprintf(fp, "name: %s, power: %d, duration: %d, passive: %d\n",
-                task_list[i].name, task_list[i].power, task_list[i].duration_min, task_list[i].bool_is_passive);
+        fprintf(fp, "name: %s, power: %d, duration: %.1f, passive: %d\n",
+                task_list[i].name, task_list[i].power, task_list[i].duration, task_list[i].bool_is_passive);
     }
 
     fclose(fp);
@@ -97,10 +93,12 @@ void Initialize_Tasks (task *task_list, int *task_amount) {
         strcpy(task_list[i].name, EMPTY_TASK_NAME);
         task_list[i].bool_is_passive = 0;
         task_list[i].power = 0;
-        task_list[i].duration_min = 0;
-        task_list[i].duration_hrs = 0.0; 
+        task_list[i].duration = 0.0; 
         task_list[i].kW = 0.0;
+
         task_list[i].start_hr = 0;
+        task_list[i].end_hr = 0;
+        task_list[i].is_assigned = 0;
     }
 }
 
@@ -109,7 +107,8 @@ void Add_Task (task *task_list, int *task_amount) {
     task result;
     char name[TASK_NAME_MAX],
          temp[TASK_NAME_MAX];
-    int power = 0, duration = 0, bool_is_passive = 0;
+    int power = 0, bool_is_passive = 0;
+    double duration = 0.0;
 
     if (*task_amount >= TASK_AMOUNT_MAX) {
         printf("The maximum amount of tasks has been added.\n");
@@ -125,8 +124,7 @@ void Add_Task (task *task_list, int *task_amount) {
 
     strcpy(result.name, name);
     result.power = power;
-    result.duration_min = duration;
-    result.duration_hrs = Calculate_Hours(result);
+    result.duration = duration;
     result.kW = Calculate_kW(result);
     result.bool_is_passive = bool_is_passive;
 
@@ -138,7 +136,7 @@ void Add_Task (task *task_list, int *task_amount) {
 }
 
 /* Get input for a new task before adding it to the task list */
-void Get_Task_Input (char *temp, char *name, int *power, int *duration, int *is_passive) {
+void Get_Task_Input (char *temp, char *name, int *power, double *duration, int *is_passive) {
     char bool_input;
 
     printf("Task name (max %d): ", TASK_NAME_MAX);
@@ -149,9 +147,9 @@ void Get_Task_Input (char *temp, char *name, int *power, int *duration, int *is_
     fgets(temp, TASK_NAME_MAX, stdin);
     sscanf(temp, " %d", power);
 
-    printf("Task duration (min): ");
+    printf("Task duration (hrs): ");
     fgets(temp, TASK_NAME_MAX, stdin);
-    sscanf(temp, " %d", duration);
+    sscanf(temp, " %lf", duration);
 
     printf("Is the task passive? (y/n): ");
     fgets(temp, TASK_NAME_MAX, stdin);
@@ -174,11 +172,12 @@ void Remove_Task (task *task_list, int *task_amount, int id) {
 
     strcpy(result.name, EMPTY_TASK_NAME);
     result.power = 0;
-    result.duration_min = 0;
-    result.duration_hrs = 0.0;
+    result.duration = 0.0;
     result.kW = 0.0;
     result.bool_is_passive = 0;
     result.start_hr = 0;
+    result.end_hr = 0;
+    result.is_assigned = 0;
 
     task_list[id - 1] = result;
     *task_amount -= 1;
@@ -196,9 +195,9 @@ int Compare_Tasks (const void *ip1, const void *ip2) {
     const task *task1 = (task *) ip1,
                *task2 = (task *) ip2;
     
-    if ((task1->kW / task1->duration_hrs) > (task2->kW / task2->duration_hrs))
+    if ((task1->kW * task1->duration) > (task2->kW * task2->duration))
         return -1;
-    else if ((task1->kW / task1->duration_hrs) < (task2->kW / task2->duration_hrs))
+    else if ((task1->kW * task1->duration) < (task2->kW * task2->duration))
         return 1;
     else
         return 0;

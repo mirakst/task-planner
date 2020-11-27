@@ -7,25 +7,29 @@
 #define READ_LINE_MAX 70
 
 struct task {
-    int bool_is_passive;
-
+    /* Basic info */
+    int bool_is_passive,
+        power;
     char name[TASK_NAME_MAX];
-    int power,
-        duration_min,
-        start_hr;
     double kW,
-           duration_hrs;
+           duration;
+    
+    /* Assignment */
+    int is_assigned,
+        start_hr,
+        end_hr;
+    double min_price,
+           max_price;
 };
 typedef struct task task;
 
 void Initialize_Tasks(task *, int *);
 int Load_Tasks (task *, int *);
 double Calculate_kW (task);
-double Calculate_Hours (task);
 int Save_Tasks (task *, int);
 void Print_Task_List(task *, int);
 void Add_Task (task *, int *);
-void Get_Task_Input (char *, char *, int *, int *, int *);
+void Get_Task_Input (char *, char *, int *, double *, int *);
 void Remove_Task (task *, int *, int);
 void Sort_Task_List (task *);
 int Compare_Tasks (const void *, const void *);

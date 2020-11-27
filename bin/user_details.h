@@ -18,4 +18,5 @@ void Set_Available_Hours (User *);
 int Load_User_Details (User *);
 int Save_User_Details (User);
 void Print_Settings (User);
-void Set_Ignore_Hours(User *);
+void Set_Ignore_Hours (User *);
+void Acclimation_Index (User *);
