@@ -144,7 +144,7 @@ void Save(User user, task task_list[TASK_AMOUNT_MAX], int task_amount) {
 /* FUCKING SUGGEST */
 /* EVT. tilføj at aktive tasks ikke må overlappe */
 void Find_Lowest_Price (User user, task *p_task, double p[][2]) {
-    int i, j, end_hr = 0, avg_hr_start = 0, avg_hr_end = 0, k = 0, skip_hr = 0;
+    int i, j, end_hr = 0, avg_hr_start = 0, avg_hr_end = 0, skip_hr = 0;
     double price = 0.0, avg = 0.0, avg_min = 100.0, avg_max = 0.0;
 
     int duration = (int) ceil(p_task->duration);
@@ -169,10 +169,8 @@ void Find_Lowest_Price (User user, task *p_task, double p[][2]) {
         }
         
         if(!skip_hr) {
-            k = i;
-
             for (j = 0; j < duration; j++)
-                price += p[Wrap_Hour(k + j)][0];
+                price += p[Wrap_Hour(i + j)][0];
             
             avg = price / duration;
             
