@@ -28,6 +28,7 @@
 #define ADD_TASK            "task add\n"
 #define REMOVE_TASK         "task remove"
 #define SUGGEST             "suggest\n"
+#define CHANGE_DAY          "change day\n"
 #define SETTINGS            "settings\n"
 #define SAVE_USER           "save\n"
 

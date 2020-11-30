@@ -1,4 +1,5 @@
 .vscode/tasks.json
+vscode/settings.json
 test.c
 tasks.o
 tasklist.txt
@@ -7,3 +8,4 @@ a.exe
 README.md
 main.exe
 main
+csv maker/date-get

@@ -77,6 +77,9 @@ int main(void) {
                 
             Print_Suggestions (task_amount, task_list);
         }
+        else if (!strcmp(cmd_input, CHANGE_DAY)) {
+            Change_Day(prices);
+        }
         else if (!strcmp(cmd_input, ADD_TASK))
             Add_Task(task_list, &task_amount);
         else if (strstr(cmd_input, REMOVE_TASK)) {
@@ -98,14 +101,15 @@ int main(void) {
 /* Performs all initialization and loading of structs and variables */
 void Initialize(double prices[][2], double prices_sorted[][2], User *user, task task_list[TASK_AMOUNT_MAX], int *task_amount) {
     int file_status = 0;
+    int default_day = 1;
 
     /* Attempts to load price file. Terminates if there is none */
-    file_status = Calculate_Prices(prices, 0);
+    file_status = Calculate_Prices(prices, 0, default_day);
     if (file_status == -1) {
         printf("Exiting.\n");
         exit(EXIT_FAILURE);
     }
-    Calculate_Prices(prices_sorted, 1);
+    Calculate_Prices(prices_sorted, 1, default_day);
 
     /* Attempt to load user details. Starts setup if there is no file */
     user->bool_hours = 0;
@@ -126,6 +130,7 @@ void Initialize(double prices[][2], double prices_sorted[][2], User *user, task 
         printf("Loaded %d tasks successfully.\n", *task_amount);
     else if (file_status == -1)
         printf("Failed to load task configuration file: %s.\n", FILE_TASKLIST);
+    printf("Prices have been initialized from day: %d.\n", default_day);
 }
 
 /* Saves the user details and task list */
