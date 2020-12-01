@@ -1,6 +1,6 @@
 /* 
  * Navne: Admir Bevab, Daniel Berwald, Anders Mariegaard, Nikolaj Dam, Mikkel Stridsen, Torbjørn Helstad, Kasper Henningsen.
- * Mails: sw1a405a@student.aau.dk
+ * Mails: SW1A405a@student.aau.dk
  * Gruppe: A405a
  * Studieretning: Software 
  */
@@ -14,11 +14,14 @@ int main(void) {
     double prices[HOURS_PER_DAY][2],
         prices_sorted[HOURS_PER_DAY][2];
     task task_list[TASK_AMOUNT_MAX];
+    time_t t = time(NULL);
+    tm time = *localtime(&t);
     int task_amount = 0,
         task_id = 0,
-        i;
+        i,
+        day;
 
-    Initialize(prices, prices_sorted, &user, task_list, &task_amount);
+    Initialize(prices, prices_sorted, &user, task_list, time, &task_amount);
 
     do {
         /* Get user input and convert to lower case letters */
@@ -71,11 +74,24 @@ int main(void) {
         /* Tasks */
         else if (!strcmp(cmd_input, LIST_TASKS))
             Print_Task_List(task_list, task_amount);
-        else if (!strcmp(cmd_input, SUGGEST)) {       /* HER SKER DER NOGET !!! */
-            for (i = 0; i < task_amount; i++)
-                Find_Lowest_Price (user, &task_list[i], prices);
+        else if (!strcmp(cmd_input, SUGGEST)) {                       /* HER SKER DER NOGET !!! */
+            for (i = 0; i < task_amount; i++)                         /* også her */
+                Find_Lowest_Price (user, &task_list[i], prices, 0);   /* men ikke her */
                 
-            Print_Suggestions (task_amount, task_list);
+            Print_Suggestions (task_amount, task_list, 0);
+        }
+        else if (!strcmp(cmd_input, SUGGEST_YEAR)) {     /* HER ER DET ENDNU VILDERE !!! */
+            for (i = 0; i < task_amount; i++) {
+                task_list[i].max_price = 0;
+                task_list[i].min_price = 0;
+            }
+            for (day = 1; day <= DAYS_PER_YEAR; day++) {
+                Calculate_Prices (prices, 0, day);
+                for (i = 0; i < task_amount; i++) {
+                    Find_Lowest_Price (user, &task_list[i], prices, 1);
+                }
+            }
+            Print_Suggestions (task_amount, task_list, 1);
         }
         else if (!strcmp(cmd_input, CHANGE_DAY)) {
             Change_Day(prices);
@@ -99,17 +115,19 @@ int main(void) {
 }
 
 /* Performs all initialization and loading of structs and variables */
-void Initialize(double prices[][2], double prices_sorted[][2], User *user, task task_list[TASK_AMOUNT_MAX], int *task_amount) {
+void Initialize(double prices[][2], double prices_sorted[][2], User *user, task task_list[TASK_AMOUNT_MAX], tm time, int *task_amount) {
     int file_status = 0;
-    int default_day = 1;
+    int today = time.tm_yday;
+    char *weekday[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
     /* Attempts to load price file. Terminates if there is none */
-    file_status = Calculate_Prices(prices, 0, default_day);
+    file_status = Calculate_Prices(prices, 0, today);
     if (file_status == -1) {
         printf("Exiting.\n");
         exit(EXIT_FAILURE);
     }
-    Calculate_Prices(prices_sorted, 1, default_day);
+    Calculate_Prices(prices_sorted, 1, today);
+    printf("Today is %s, %.2d-%.2d-%.2d\n", weekday[time.tm_wday], time.tm_mday, time.tm_mon + 1, time.tm_year + 1900);
 
     /* Attempt to load user details. Starts setup if there is no file */
     user->bool_hours = 0;
@@ -124,13 +142,13 @@ void Initialize(double prices[][2], double prices_sorted[][2], User *user, task 
     user->bool_name = file_status;
 
     /* Attempts to load tasks from tasklist file */
-    Initialize_Tasks(task_list, task_amount);
+    Initialize_Tasks(task_list);
     file_status = Load_Tasks(task_list, task_amount);
     if (file_status == 1)
         printf("Loaded %d tasks successfully.\n", *task_amount);
     else if (file_status == -1)
         printf("Failed to load task configuration file: %s.\n", FILE_TASKLIST);
-    printf("Prices have been initialized from day: %d.\n", default_day);
+    printf("Prices have been initialized from day: %d\n", today);
 }
 
 /* Saves the user details and task list */
@@ -148,7 +166,7 @@ void Save(User user, task task_list[TASK_AMOUNT_MAX], int task_amount) {
 
 /* FUCKING SUGGEST */
 /* EVT. tilføj at aktive tasks ikke må overlappe */
-void Find_Lowest_Price (User user, task *p_task, double p[][2]) {
+void Find_Lowest_Price (User user, task *p_task, double p[][2], int do_year) {
     int i, j, end_hr = 0, avg_hr_start = 0, avg_hr_end = 0, skip_hr = 0;
     double price = 0.0, avg = 0.0, avg_min = 100.0, avg_max = 0.0;
 
@@ -191,10 +209,16 @@ void Find_Lowest_Price (User user, task *p_task, double p[][2]) {
     }
     
     /* Assign the lowest avg price values to the input task */
-    p_task->start_hr = avg_hr_start;
-    p_task->end_hr = avg_hr_end;
-    p_task->min_price = avg_min;
-    p_task->max_price = avg_max;
+    if (do_year) {
+        p_task->min_price += avg_min;
+        p_task->max_price += avg_max;
+    }
+    else {
+        p_task->start_hr = avg_hr_start;
+        p_task->end_hr = avg_hr_end;
+        p_task->min_price = avg_min;
+        p_task->max_price = avg_max;
+    }
 }
 
 /* Returns the input hour in the range 0-23 */
@@ -203,10 +227,22 @@ int Wrap_Hour (int hour) {
 }
   
 /* Prints the suggested starting times and potential savings for all tasks */
-void Print_Suggestions (int task_amount, task task_list[TASK_AMOUNT_MAX]) {
+void Print_Suggestions (int task_amount, task task_list[TASK_AMOUNT_MAX], int do_year) {
     int i;
     
     Print_Line(0, "");
+    if (do_year) {
+        printf("If you were to follow recommendations for a full year, this is the expected outcome.\n");
+        printf("%-20s %10s %12s %12s %13s\n", "Task", "", "Min price", "Max price", "Savings");
+        for (i = 0; i < task_amount; i++) {
+            printf("%-29s %13.2f %12.2f %13.1f%%\n",
+                task_list[i].name,
+                task_list[i].min_price / 365,
+                task_list[i].max_price / 365,
+                Fixed_Percent(task_list[i].max_price, task_list[i].min_price));
+    }
+    }
+    else {
     printf("%-20s %8s %2s %12s %12s %13s\n", "Task", "Hours", "", "Min price", "Max price", "Savings");
     for (i = 0; i < task_amount; i++) {
         printf("%-20s %5.2d-%-2.2d %13.3f %12.3f %13.1f%%\n",
@@ -216,6 +252,7 @@ void Print_Suggestions (int task_amount, task task_list[TASK_AMOUNT_MAX]) {
             task_list[i].min_price,
             task_list[i].max_price,
             Fixed_Percent(task_list[i].max_price, task_list[i].min_price));
+    }
     }
     Print_Line(0, "");
 }

@@ -1,15 +1,15 @@
-/* TODO: 
- * Test-cases (too long task name, char instead of int, etc...)
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <assert.h>
 #include "tasks.h"
 #include "graphics.h"
 
-/* Prints a list of all non-empty tasks */
+/** Prints a list of all non-empty tasks.
+ *  @param[i] task_list The active array of tasks.
+ *  @param[i] task_amount An int that keeps track of the amount of non-empty tasks in the array. 
+ */
 void Print_Task_List (task *task_list, int task_amount) {
     int i;
     if (task_amount == 0) {
@@ -33,7 +33,11 @@ void Print_Task_List (task *task_list, int task_amount) {
     Print_Line(0, "");
 }
 
-/* Loads tasks from the config file. Returns 0 if nothing is loaded */
+/** Loads tasks from the config file.
+ *  @param[i] task_list The active array of tasks.
+ *  @param[i] task_amount An int that keeps track of the amount of non-empty tasks in the array. 
+ *  @return Returns -1 if the file was not found, 0 if nothing was loaded, and 1 otherwise.
+ */
 int Load_Tasks (task *task_list, int *task_amount) {
     FILE *fp;
     char temp_string[READ_LINE_MAX];
@@ -59,12 +63,17 @@ int Load_Tasks (task *task_list, int *task_amount) {
     return *task_amount > 0 ? 1 : 0;
 }
 
-/* Returns the kW usage of the input task */
+/** Calculates the kWh usage of a given task.
+ *  @param[i] task A non-empty task from the task array. 
+ *  @return Returns the kWh usage of the task as a double. */
 double Calculate_kW (task task) {
     return (double)task.power / W_PER_KW;
 }
 
-/* Saves all tasks to the config file. Returns 0 if nothing is saved */
+/** Saves all tasks from the task array to the config file.
+ *  @param[i] task_list The active array of tasks.
+ *  @param[i] task_amount An int that keeps track of the amount of non-empty tasks in the array. 
+ *  @return Returns -1 if the file could not be saved, and 1 otherwise. */
 int Save_Tasks (task *task_list, int task_amount) {
     FILE *fp;
     int i;
@@ -86,8 +95,9 @@ int Save_Tasks (task *task_list, int task_amount) {
     return 1;    
 }
 
-/* Initializes the input task list to be empty */
-void Initialize_Tasks (task *task_list, int *task_amount) {
+/** Initializes the values of all possible tasks in the task array to 0.
+ *  @param[i] task_list The active array of tasks. */
+void Initialize_Tasks (task *task_list) {
     int i;
     for (i = 0; i < TASK_AMOUNT_MAX; i++) {
         strcpy(task_list[i].name, EMPTY_TASK_NAME);
@@ -99,14 +109,18 @@ void Initialize_Tasks (task *task_list, int *task_amount) {
         task_list[i].start_hr = 0;
         task_list[i].end_hr = 0;
         task_list[i].is_assigned = 0;
+        task_list[i].max_price = 0;
+        task_list[i].min_price = 0;
     }
 }
 
-/* Adds a user-defined task to the task list */
+/** Adds a user-defined task to the task array.
+ *  If the max task amount has been reached, or the user input is incorrect, the function returns before adding any task.
+ *  @param[i] task_list The active array of tasks.
+ *  @param[i] task_amount A pointer to an int that keeps track of the amount of non-empty tasks in the array. */
 void Add_Task (task *task_list, int *task_amount) {
     task result;
-    char name[TASK_NAME_MAX],
-         temp[TASK_NAME_MAX];
+    char name[TASK_NAME_MAX];
     int power = 0, bool_is_passive = 0;
     double duration = 0.0;
 
@@ -115,7 +129,7 @@ void Add_Task (task *task_list, int *task_amount) {
         return;
     }
     
-    Get_Task_Input(temp, name, &power, &duration, &bool_is_passive);
+    Get_Task_Input(name, &power, &duration, &bool_is_passive);
 
     if(!strcmp(name, EMPTY_TASK_NAME) || power <= 0 || duration <= 0) {
         printf("Error in user input, cancelling...\n"); 
@@ -135,8 +149,13 @@ void Add_Task (task *task_list, int *task_amount) {
     printf("Task: %s was successfully added.\n", name);
 }
 
-/* Get input for a new task before adding it to the task list */
-void Get_Task_Input (char *temp, char *name, int *power, double *duration, int *is_passive) {
+/** Gets user input for the Add_Task() function.
+ *  @param[i] name A string that contains the name of the task.
+ *  @param[i] power An int that represents the power usage of the task (in Watts).
+ *  @param[i] duration A double that represents the duration of the task (in hours).
+ *  @param[i] is_passive A boolean (int in C) that represents whether the task is passive or not (true = 1, false = 0). */
+void Get_Task_Input (char *name, int *power, double *duration, int *is_passive) {
+    char temp[TASK_NAME_MAX];
     char bool_input;
 
     printf("Task name (max %d): ", TASK_NAME_MAX);
@@ -159,7 +178,11 @@ void Get_Task_Input (char *temp, char *name, int *power, double *duration, int *
         *is_passive = 1;
 }
 
-/* Empties a task in the input array at the given index */
+/** Removes a task from the task array.
+ *  The selected task is effectively reset, since it cannot actually be removed from a static array in C.
+ *  @param[i] task_list The active array of tasks.
+ *  @param[i] task_amount A pointer to an int that keeps track of the amount of non-empty tasks in the array.
+ *  @param[i] id A user-input int that represents the id/index of the task to be removed. */
 void Remove_Task (task *task_list, int *task_amount, int id) {
     task result;
     char task_name[TASK_NAME_MAX];
@@ -185,13 +208,18 @@ void Remove_Task (task *task_list, int *task_amount, int id) {
     printf("Task: %s was successfully removed.\n", task_name);
 }
 
-/* Sorts the input array with qsort and the Compare_Tasks function */
+/** Sorts the input task array.
+ *  The compare function \fn(Compare_Tasks) prioritizes non-empty tasks with the highest kWh usage.
+ *  @param[i] task_list The active array of tasks. */
 void Sort_Task_List (task *task_list) {
     qsort(task_list, TASK_AMOUNT_MAX, sizeof(task), Compare_Tasks);
 }
 
-/* Compare two tasks and prioritize non-empty tasks */
-int Compare_Tasks (const void *ip1, const void *ip2) {
+/** Compare function for qsort.
+ *  Non-empty tasks with the highest kWh usage are prioritized.
+ *  @param[i] ip1 The first element to be compared.
+ *  @param[i] ip1 The second element to be compared. */
+ int Compare_Tasks (const void *ip1, const void *ip2) {
     const task *task1 = (task *) ip1,
                *task2 = (task *) ip2;
     

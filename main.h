@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <assert.h>
+#include <time.h>
 /* Custom libraries */
 #include "bin/tasks.h"
 #include "bin/calculate_prices.h"
@@ -13,6 +14,7 @@
 #include "bin/help.h"
 
 #define INPUT_MAX 20
+#define DAYS_PER_YEAR 365
 
 /* Commands */
 #define EXIT                "exit\n"
@@ -28,6 +30,7 @@
 #define ADD_TASK            "task add\n"
 #define REMOVE_TASK         "task remove"
 #define SUGGEST             "suggest\n"
+#define SUGGEST_YEAR        "suggest year\n"
 #define CHANGE_DAY          "change day\n"
 #define SETTINGS            "settings\n"
 #define SAVE_USER           "save\n"
@@ -38,6 +41,8 @@
 #define SET_HOURS           "set hours\n"
 */
 
+typedef struct tm tm;
+
 /* Converts the input string to lower case */
 void String_To_Lower(char *str) {
     int i;
@@ -45,9 +50,9 @@ void String_To_Lower(char *str) {
         str[i] = tolower(str[i]);
 }
 
-void Initialize (double[][2], double[][2], User *, task[TASK_AMOUNT_MAX], int *);
+void Initialize (double[][2], double[][2], User *, task[TASK_AMOUNT_MAX], struct tm, int *);
 void Save (User, task[TASK_AMOUNT_MAX], int);
-void Find_Lowest_Price (User, task*, double[][2]);
+void Find_Lowest_Price (User, task*, double[][2], int);
 int Wrap_Hour (int);
 double Fixed_Percent (double, double);
-void Print_Suggestions (int, task[TASK_AMOUNT_MAX]);
+void Print_Suggestions (int, task[TASK_AMOUNT_MAX], int);
