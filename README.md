@@ -31,7 +31,7 @@ Skrives umiddelbart før hver funktion / struct på følgende måde:
     /** Converts a given date to the corresponding day no. in a year.
      * @param[i] date The date in the current month (1-31).
      * @param[i] month The current month (1-12).
-     * @return Returns the day as a number (1-365).
+     * @return Returns the day as a number (1-365). */
     int Get_Day_In_Year (int date, int month) {
         ...
     }
