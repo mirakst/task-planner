@@ -15,12 +15,15 @@
 
 #define INPUT_MAX 20
 #define DAYS_PER_YEAR 365
+#define FIRST_WEEKDAY_OF_YEAR 3
+#define DAYS_PER_WEEK 7
 
 /* Commands */
 #define EXIT                "exit\n"
 #define LIST_PRICES         "list prices\n"
 #define LIST_PRICES_SORTED  "list prices sorted\n"
 #define LIST_TASKS          "task list\n"
+#define LIST_ALL_TASKS      "task list all\n"
 #define HELP                "help\n"
 #define HELP_TASKS          "help task\n"
 #define HELP_PRICES         "help prices\n"
@@ -29,6 +32,7 @@
 #define RECOMMEND           "recommend\n"
 #define ADD_TASK            "task add\n"
 #define REMOVE_TASK         "task remove"
+#define EDIT_TASK           "task edit"
 #define SUGGEST             "suggest\n"
 #define SUGGEST_YEAR        "suggest year\n"
 #define CHANGE_DAY          "change day\n"
@@ -41,18 +45,22 @@
 #define SET_HOURS           "set hours\n"
 */
 
-typedef struct tm tm;
-
-/* Converts the input string to lower case */
+/** Converts the input string to lower case */
 void String_To_Lower(char *str) {
     int i;
     for (i = 0; i < INPUT_MAX; i++)
         str[i] = tolower(str[i]);
 }
 
+void Get_User_Input (char *);
 void Initialize (double[][2], double[][2], User *, task[TASK_AMOUNT_MAX], struct tm, int *);
 void Save (User, task[TASK_AMOUNT_MAX], int);
-void Find_Lowest_Price (User, task*, double[][2], int);
+
+void Find_Lowest_Price (User, task*, task[TASK_AMOUNT_MAX], int, double[][2], int);
 int Wrap_Hour (int);
 double Fixed_Percent (double, double);
-void Print_Suggestions (int, task[TASK_AMOUNT_MAX], int);
+int Day_To_Weekday (int);
+void Print_Suggestions (int, task[TASK_AMOUNT_MAX], int, struct tm);
+
+/* Testing */
+void Test_All(void);

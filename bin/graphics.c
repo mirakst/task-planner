@@ -2,7 +2,9 @@
 #include <string.h>
 #include "graphics.h"
 
-/* Prints a line. Wraps around a word if has_word = 1 */
+/** Prints a line. Wraps around a word if has_word = 1 
+ * @param [i] int has_word whether a word is present on the line or not.
+ * @param [i] string of the word that would be wrapped around. */
 void Print_Line(int has_word, char *word) {
     int i,
         word_length = strlen(word),

@@ -1,12 +1,14 @@
 #include "help.h"
 
+/** Calls all the other help functions. */
 void Help_All(void) {
     Help_Tasks(0);
     Help_Prices(0);
     Help_User_Details(1);
 }
 
-/* Prints a list of helpful commands for tasks */
+/** Prints a list of helpful commands for tasks. 
+ * @param[i] int b, if the list should end in a line. */
 void Help_Tasks(int b) {
     Print_Line(1, "Tasks");
     printf("%-20s -- Lists all tasks.\n", "List tasks");
@@ -17,7 +19,8 @@ void Help_Tasks(int b) {
         Print_Line(0, "");
 }
 
-/* Prints a list of helpful commands for prices */
+/** Prints a list of helpful commands for prices. 
+ * @param[i] int b, if the list should end in a line. */
 void Help_Prices(int b) {
     Print_Line(1, "Prices");
     printf("%-20s -- Lists prices pr hour\n", "List prices");
@@ -28,7 +31,8 @@ void Help_Prices(int b) {
         Print_Line(0, "");
 }
 
-/* Prints a list of helpful commands for User_Details */
+/** Prints a list of helpful commands for User_Details. 
+ * @param int b, if the list should end in a line. */
 void Help_User_Details(int b) {
     Print_Line(1, "User details");
     printf("%-20s -- Changes the name in the user details.\n", "Set name");

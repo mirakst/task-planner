@@ -5,6 +5,8 @@
 #include "user_details.h"
 #include "graphics.h"
 
+/** Performs a setup if there is no settings file.
+ * @param[o] The active user structure. */
 void First_Time_Setup (User *user) {
     Print_Line(1, "Starting first setup");
     Get_Name(user);
@@ -12,7 +14,8 @@ void First_Time_Setup (User *user) {
     Print_Line(0, "");
 }
 
-/* Takes the name of the user */
+/** Lets the user write in their name.
+ * @param[o] The active user structure */
 void Get_Name (User *user) {
     char temp_string[USERNAME_MAX];
 
@@ -23,7 +26,8 @@ void Get_Name (User *user) {
     user->bool_name = 1;
 }
 
-/* Function for resetting the unavailable hours, sets every hour to 0 for available */
+/** Reset the available hours.
+ * @param[i/o] time The user's current available hours. */
 void Reset_Available_Hours (int time[HOURS_PER_DAY]) {
     int i;
     
@@ -33,7 +37,8 @@ void Reset_Available_Hours (int time[HOURS_PER_DAY]) {
     printf("The available hours were succesfully reset.\n");
 }
 
-/* Adds the available times to an array for easy access */
+/** Adds the available times to an int array
+ * @param[i/o] the active user struct */
 void Set_Available_Hours (User *user) {
     int i;
     int start_time = 24, end_time = 24;
@@ -75,12 +80,12 @@ void Set_Available_Hours (User *user) {
                 user->available_hours[i] = 1;
         }
         
-        printf("Hour %2d - %d\n", i, user->available_hours[i]); 
     }
     user->bool_hours = 1;
 }
 
-/* Prints the input user details */
+/** Prints the input user details
+ * @param [i] The active user struct */
 void Print_Settings (User user) {
     int i;
     
@@ -102,7 +107,9 @@ void Print_Settings (User user) {
     Print_Line(0, "");
 }
 
-/* Attempts to load user details from file */
+/** Attempts to load user details from file
+ * @param [o] The active user struct 
+ * @return -1 or 1 */
 int Load_User_Details (User *user) {
     char temp_string[100];
     int i = 0;
@@ -127,7 +134,9 @@ int Load_User_Details (User *user) {
     return 1;
 }
 
-/* If both a name and unavailable hours have been set the user can save their settings */
+/** Saves the user's settings to file
+ * @param [i] The active user struct
+ * @return 0, -1 or 1 */
 int Save_User_Details (User user) {
     int i = 0;
     FILE *p_File;
@@ -148,7 +157,8 @@ int Save_User_Details (User user) {
     return 1;
 }
 
-/* Sets ignore_hours in the user struct according to the given input */
+/** Sets ignore_hours in the user struct according to the given input
+ * @param [o] the active user struct  */
 void Set_Ignore_Hours(User *user) {
     char temp[5],
          bool_input;
@@ -179,33 +189,36 @@ void Acclimation_Index(User *user) {
     printf("0: %-20s\n", "Exit");
     Print_Line(0, "");
 
-    printf("Choose a setting (nikolaj sutter pik): ");
-    fgets(temp_string, 5, stdin);
-    sscanf(temp_string, " %d", &input);
-    
-    switch (input) {
-    case 0:
-        return;
-        break;
-    case 1:
-        Print_Settings(*user);
-        break;
-    case 2:
-        Get_Name(user);
-        break;
-    case 3:
-        Set_Available_Hours(user);
-        break;
-    case 4:
-        Reset_Available_Hours(user->available_hours);
-        break;
-    case 5:
-        Save_User_Details(*user);
-        break;
-    case 6:
-        Set_Ignore_Hours(user);
-        break;
-    default:
-        return;
-    }
+    do {
+        printf("Choose a setting: ");
+        fgets(temp_string, 5, stdin);
+        sscanf(temp_string, " %d", &input);
+        
+        switch (input) {
+        case 0:
+            printf("Exiting user settings.\n");
+            return;
+        case 1:
+            Print_Settings(*user);
+            break;
+        case 2:
+            Get_Name(user);
+            break;
+        case 3:
+            Set_Available_Hours(user);
+            break;
+        case 4:
+            Reset_Available_Hours(user->available_hours);
+            break;
+        case 5:
+            Save_User_Details(*user);
+            break;
+        case 6:
+            Set_Ignore_Hours(user);
+            break;
+        default:
+            printf("The command was not recognized.\n"); 
+            break;
+        }
+    } while (input);
 }

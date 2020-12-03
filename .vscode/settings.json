@@ -1,3 +1,7 @@
 {
-    "terminal.integrated.splitCwd": "workspaceRoot"
+    "terminal.integrated.splitCwd": "workspaceRoot",
+    "files.associations": {
+        "cmath": "c",
+        "typeinfo": "c"
+    }
 }

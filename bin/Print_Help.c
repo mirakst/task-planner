@@ -1,4 +1,4 @@
-#include "Print_Help.h"
+#include "Help.h"
 
 void Help_All(void) {
     Help_Tasks();
@@ -7,7 +7,7 @@ void Help_All(void) {
     Help_User_Details();
 }
 
-/* Prints a list of helpfull comands for Tasks */
+/** Prints a list of helpfull comands for Tasks */
 void Help_Tasks(void) {
     Print_Line(0, "");
     printf("%-13s -- Lists all tasks.\n", "List tasks");
@@ -16,7 +16,7 @@ void Help_Tasks(void) {
     Print_Line(0, "");
 }
 
-/* Prints a list of helpfull comands for Prices */
+/** Prints a list of helpfull comands for Prices */
 void Help_Prices(void) {
     Print_Line(0, "");
     printf("%-18s -- Lists prices pr hour\n", "List prices");
@@ -24,14 +24,14 @@ void Help_Prices(void) {
     Print_Line(0, "");
 }
 
-/* Prints a list of helpfull comands for Settings */
+/** Prints a list of helpfull comands for Settings */
 void Help_Settings(void) {
     Print_Line(0, "");
     printf("%-11s -- ***\n", "Missing command");
     Print_Line(0, "");
 }
 
-/* Prints a list of helpfull comands for User_Details */
+/** Prints a list of helpfull comands for User_Details */
 void Help_User_Details(void) {
     Print_Line(0, "");
     printf("%-11s -- ***\n", "Missing command");
