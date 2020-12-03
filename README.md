@@ -24,12 +24,28 @@ Indrykning består af intervaller på 4 mellemrum
         Like this
     }
 
-## Prioriteringsliste
+## Dokumentation (Doxygen)
 
-1. God data på timepris, og god formidling af det.
-   * Calculate_Prices
-2. Brugerindflydelse på output.
-   * Get_User_Data
-   * Load_User_Data
-3. Tasks/Devices til planlægning af forbrug.
-   * Modify_Tasks_And_Devices
+Skrives umiddelbart før hver funktion / struct på følgende måde:
+
+    /** Converts a given date to the corresponding day no. in a year.
+     * @param[i] date The date in the current month (1-31).
+     * @param[i] month The current month (1-12).
+     * @return Returns the day as a number (1-365). */
+    int Get_Day_In_Year (int date, int month) {
+        ...
+    }
+    
+Den første linje beskriver hvad funktionen gør:
+
+    /** Converts a given date to the corresponding day no. in a year.
+    
+De næste linjer forklarer hvad de forskellige parametre gør:
+
+    @param[i]   //input parameter
+    @param[o]   //output
+    @param[i/o] //input/output
+
+Den sidste linje forklarer hvad funktionen returnerer. (Gælder ikke for void-funktioner):
+
+    @return Returns the day as a number (1-365).
