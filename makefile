@@ -1,2 +1,2 @@
-mainmake: main.c bin/calculate_prices.c bin/tasks.c bin/user_details.c bin/graphics.c bin/help.c
-	gcc main.c bin/calculate_prices.c bin/tasks.c bin/user_details.c bin/graphics.c bin/help.c -lm -ansi -Wall -pedantic -I. -o main
+mainmake: main.c bin/calculate_prices.c bin/tasks.c bin/user_details.c bin/help.c bin/graphics.c
+	gcc main.c bin/calculate_prices.c bin/tasks.c bin/user_details.c bin/help.c bin/graphics.c -lm -ansi -Wall -pedantic -I. -o main

@@ -6,6 +6,7 @@
 #include <math.h>
 #include <assert.h>
 #include <time.h>
+
 /* Custom libraries */
 #include "bin/tasks.h"
 #include "bin/calculate_prices.h"
@@ -13,7 +14,7 @@
 #include "bin/graphics.h"
 #include "bin/help.h"
 
-#define INPUT_MAX 20
+#define INPUT_MAX 30
 #define DAYS_PER_YEAR 365
 #define FIRST_WEEKDAY_OF_YEAR 3
 #define DAYS_PER_WEEK 7
@@ -23,13 +24,10 @@
 #define LIST_PRICES         "list prices\n"
 #define LIST_PRICES_SORTED  "list prices sorted\n"
 #define LIST_TASKS          "task list\n"
-#define LIST_ALL_TASKS      "task list all\n"
 #define HELP                "help\n"
 #define HELP_TASKS          "help task\n"
 #define HELP_PRICES         "help prices\n"
 #define HELP_SETTINGS       "help settings\n"
-#define HELP_USER_DETAILS   "help user details\n"
-#define RECOMMEND           "recommend\n"
 #define ADD_TASK            "task add\n"
 #define REMOVE_TASK         "task remove"
 #define EDIT_TASK           "task edit"
@@ -39,28 +37,96 @@
 #define SETTINGS            "settings\n"
 #define SAVE_USER           "save\n"
 
-/*#define LIST_SETTINGS       "list settings\n"
-#define SET_NAME            "set name\n"
-#define RESET_HOURS         "reset hours\n"
-#define SET_HOURS           "set hours\n"
-*/
+typedef enum Commands {_exit, unrecognized,
+                       help, help_tasks, help_prices, help_settings,
+                       settings, change_day, save_user,
+                       list_prices, list_prices_sorted,
+                       list_tasks, add_task, remove_task, edit_task,
+                       suggest, suggest_year
+                       } Commands;
 
-/** Converts the input string to lower case */
+/* Prototypes */
+void Initialize (double[][2], double[][2], User *, task[TASK_AMOUNT_MAX], struct tm, int *, int *);
+void Save (User, task[TASK_AMOUNT_MAX], int);
+void Find_Lowest_Price (User, task*, task[TASK_AMOUNT_MAX], int, double[][2], int);
+void Suggest_Day (User, task[TASK_AMOUNT_MAX], int, double[][2], int, struct tm);
+void Suggest_Year (User, task[TASK_AMOUNT_MAX], int, double[][2], int, struct tm);
+
+/* Test functions */
+void Test_All(void);
+void Test_Wrap_Houreeeees(void);
+void Test_Day_To_Weekday(void);
+void Test_Fixed_Percent(void);
+void Test_Fixed_Percent(void);
+
+/** Converts the input string to lower case
+ *  @param str[i/o] The string to be made lowercase. */
 void String_To_Lower(char *str) {
     int i;
     for (i = 0; i < INPUT_MAX; i++)
         str[i] = tolower(str[i]);
 }
 
-void Get_User_Input (char *);
-void Initialize (double[][2], double[][2], User *, task[TASK_AMOUNT_MAX], struct tm, int *);
-void Save (User, task[TASK_AMOUNT_MAX], int);
+/** Returns the input string as a command in the Commands enum.
+ *  @param str[i] The input string.
+ *  @return The Command enum equivalent to the input string. */
+int Get_Command_From_String(char *str) {
+    if (!strcmp(str, EXIT))
+        return _exit;
+    else if (!strcmp(str, HELP))
+        return help;
+    else if (!strcmp(str, HELP_PRICES))
+        return help_prices;
+    else if (!strcmp(str, HELP_TASKS))
+        return help_tasks;
+    else if (!strcmp(str, HELP_SETTINGS))
+        return help_settings;
+    else if (!strcmp(str, SETTINGS))
+        return settings;
+    else if (!strcmp(str, SAVE_USER))
+        return save_user;
+    else if (!strcmp(str, LIST_PRICES))
+        return list_prices;
+    else if (!strcmp(str, LIST_PRICES_SORTED))
+        return list_prices_sorted;
+    else if (!strcmp(str, CHANGE_DAY))
+        return change_day;
+    else if (!strcmp(str, LIST_TASKS))
+        return list_tasks;
+    else if (!strcmp(str, ADD_TASK))
+        return add_task;
+    else if (strstr(str, REMOVE_TASK))
+        return remove_task;
+    else if (strstr(str, EDIT_TASK))
+        return edit_task;
+    else if (!strcmp(str, SUGGEST))
+        return suggest;
+    else if (!strcmp(str, SUGGEST_YEAR))
+        return suggest_year;
 
-void Find_Lowest_Price (User, task*, task[TASK_AMOUNT_MAX], int, double[][2], int);
-int Wrap_Hour (int);
-double Fixed_Percent (double, double);
-int Day_To_Weekday (int);
-void Print_Suggestions (int, task[TASK_AMOUNT_MAX], int, struct tm);
+    return unrecognized;
+}
 
-/* Testing */
-void Test_All(void);
+/** Gets input from the user. 
+ *  @param input[o] String containing the user command.
+ *  @return The command index in the command enum. */
+int Get_User_Input (char *input) {
+    printf("\nPlease enter a command: ");
+    fgets(input, INPUT_MAX, stdin);
+    String_To_Lower(input);
+    return Get_Command_From_String(input);
+}
+
+/** Wraps the input hour if it surpasses the amount of hours in a day.
+ *  @param hour[i] Amount of hours to be wrapped.
+ *  @return Returns the input hour in the range 0-23. */
+int Wrap_Hour (int hour) {
+    return (hour >= HOURS_PER_DAY) ? (hour - HOURS_PER_DAY) : hour;
+}
+
+/** Converts the input day to its weekday (2019).
+ *  @param day[i] Day to be converted.
+ *  @return Returns the input day as a weekday (0-6). */
+int Day_To_Weekday (int day) {
+    return (FIRST_WEEKDAY_OF_YEAR + (day % DAYS_PER_WEEK)) % DAYS_PER_WEEK;
+}
