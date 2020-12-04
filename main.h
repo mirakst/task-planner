@@ -20,41 +20,45 @@
 #define DAYS_PER_WEEK 7
 
 /* Commands */
-#define EXIT                "exit\n"
-#define LIST_PRICES         "list prices\n"
-#define LIST_PRICES_SORTED  "list prices sorted\n"
-#define LIST_TASKS          "task list\n"
-#define HELP                "help\n"
-#define HELP_TASKS          "help task\n"
-#define HELP_PRICES         "help prices\n"
-#define HELP_SETTINGS       "help settings\n"
-#define ADD_TASK            "task add\n"
-#define REMOVE_TASK         "task remove"
-#define EDIT_TASK           "task edit"
-#define SUGGEST             "suggest\n"
-#define SUGGEST_YEAR        "suggest year\n"
-#define CHANGE_DAY          "change day\n"
-#define SETTINGS            "settings\n"
-#define SAVE_USER           "save\n"
+#define EXIT                  "exit\n"
+#define LIST_PRICES           "list prices\n"
+#define LIST_EMISSIONS        "list emissions\n"
+#define LIST_EMISSIONS_SORTED "list emissions sorted\n"
+#define LIST_PRICES_SORTED    "list prices sorted\n" /* Muligvis ubrugt */
+#define LIST_TASKS            "task list\n"
+#define HELP                  "help\n"
+#define HELP_TASKS            "help task\n"
+#define HELP_PRICES           "help prices\n"
+#define HELP_SETTINGS         "help settings\n"
+#define ADD_TASK              "task add\n"
+#define REMOVE_TASK           "task remove"
+#define EDIT_TASK             "task edit"     
+#define SUGGEST               "suggest\n"
+#define SUGGEST_YEAR          "suggest year\n"
+#define CHANGE_DAY            "change day\n"
+#define SETTINGS              "settings\n"
+#define SAVE_USER             "save\n"
 
 typedef enum Commands {_exit, unrecognized,
                        help, help_tasks, help_prices, help_settings,
                        settings, change_day, save_user,
-                       list_prices, list_prices_sorted,
+                       list_prices, list_prices_sorted, list_emissions, list_emissions_sorted,
                        list_tasks, add_task, remove_task, edit_task,
                        suggest, suggest_year
                        } Commands;
 
 /* Prototypes */
-void Initialize (double[][2], double[][2], User *, task[TASK_AMOUNT_MAX], struct tm, int *, int *);
+void Initialize (double[][2], double[][2], double[][2], double[][2], User *, task[TASK_AMOUNT_MAX], int *, int *);
 void Save (User, task[TASK_AMOUNT_MAX], int);
-void Find_Lowest_Price (User, task*, task[TASK_AMOUNT_MAX], int, double[][2], int);
-void Suggest_Day (User, task[TASK_AMOUNT_MAX], int, double[][2], int, struct tm);
-void Suggest_Year (User, task[TASK_AMOUNT_MAX], int, double[][2], int, struct tm);
+void Find_Lowest_Price (User, task *, int[HOURS_PER_DAY], double[][2], int);
+void Suggest_Day (User, task[TASK_AMOUNT_MAX], int, double[][2], double[][2], int);
+void Suggest_Year (User, task[TASK_AMOUNT_MAX], int, double[][2], double[][2], int); 
+int Should_Skip_Hour (User, task *, int[HOURS_PER_DAY], int, int, int);
+void Assign_Task (task *, int, int, double, double, int[HOURS_PER_DAY], int);
 
 /* Test functions */
 void Test_All(void);
-void Test_Wrap_Houreeeees(void);
+void Test_Wrap_Hours(void);
 void Test_Day_To_Weekday(void);
 void Test_Fixed_Percent(void);
 void Test_Fixed_Percent(void);
@@ -89,6 +93,10 @@ int Get_Command_From_String(char *str) {
         return list_prices;
     else if (!strcmp(str, LIST_PRICES_SORTED))
         return list_prices_sorted;
+    else if (!strcmp(str, LIST_EMISSIONS))
+        return list_emissions;
+    else if (!strcmp(str, LIST_EMISSIONS_SORTED))
+        return list_emissions_sorted;
     else if (!strcmp(str, CHANGE_DAY))
         return change_day;
     else if (!strcmp(str, LIST_TASKS))
@@ -128,5 +136,5 @@ int Wrap_Hour (int hour) {
  *  @param day[i] Day to be converted.
  *  @return Returns the input day as a weekday (0-6). */
 int Day_To_Weekday (int day) {
-    return (FIRST_WEEKDAY_OF_YEAR + (day % DAYS_PER_WEEK)) % DAYS_PER_WEEK;
+    return (FIRST_WEEKDAY_OF_YEAR + ((day - 1) % DAYS_PER_WEEK)) % DAYS_PER_WEEK;
 }

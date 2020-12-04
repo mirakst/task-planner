@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include "user_details.h"
 #include "graphics.h"
+#include "help.h"
 
 /** Performs a setup if there is no settings file.
  * @param[o] The active user struct. */
@@ -38,7 +39,7 @@ void Reset_Available_Hours (int time[HOURS_PER_DAY]) {
 }
 
 /** Adds available hours to the available hours int array
- * @ */
+ *  @param user[i/o] The active user struct */
 void Set_Available_Hours (User *user) {
     int i;
     int start_time = 24, end_time = 24;
@@ -85,7 +86,7 @@ void Set_Available_Hours (User *user) {
 }
 
 /** Prints the input user details
- * @param[i] user - The active user struct */
+ * @param user[i] The active user struct */
 void Print_User (User user) {
     int i;
     
@@ -108,7 +109,7 @@ void Print_User (User user) {
 }
 
 /** Attempts to load user details from file
- * @param [o] user - The active user struct 
+ * @param user[o] The active user struct 
  * @return -1 if the file was not loaded, otherwise 1 */
 int Load_User_Details (User *user) {
     char temp_string[100];
@@ -135,7 +136,7 @@ int Load_User_Details (User *user) {
 }
 
 /** Saves the user's settings to file
- * @param [i] user - The active user struct
+ * @param user[i] The active user struct
  * @return -1 if the file could not be saved, 0 if there is nothing to save, and otherwise 1 */
 int Save_User_Details (User user) {
     int i = 0;
@@ -158,7 +159,7 @@ int Save_User_Details (User user) {
 }
 
 /** Sets ignore_hours in the user struct according to the given input
- * @param [o] user - the active user struct  */
+ * @param user[o] the active user struct  */
 void Set_Ignore_Hours(User *user) {
     char temp[5],
          bool_input;
@@ -171,12 +172,12 @@ void Set_Ignore_Hours(User *user) {
         user->is_available = 1;
     else
         user->is_available = 0;
-    printf("Set tings have been saved succesfully.\n");
+    printf("Settings have been saved succesfully.\n");
 }
 
 /** Prints the settings menu, and awaits user input.
  * Then runs the function associated with the input.
- * @param[i/o] user - The active user struct. */
+ * @param user[i/o] The active user struct. */
 void Print_Settings(User *user) {
     int input = 0;
     char temp_string[5];
@@ -186,16 +187,17 @@ void Print_Settings(User *user) {
             "2: Set name\n"
             "3: Set available hours\n"
             "4: Reset available hours\n"
-            "5: Set ignore houres\n"
+            "5: Set ignore hours\n"
             "6: Save user details\n"
+            "7: More info\n"
             "0: Go back\n");
     Print_Line(0, "");
-
+    
     do {
         printf("Choose a setting: ");
         fgets(temp_string, 5, stdin);
         sscanf(temp_string, " %d", &input);
-        
+
         switch (input) {
         case 0:
             printf("Exiting user settings.\n");
@@ -217,6 +219,10 @@ void Print_Settings(User *user) {
             break;
         case 6:
             Save_User_Details(*user);
+            printf("Settings have been saved succesfully.\n");
+            break;
+        case 7:
+            Help_Settings_Extended();
             break;
         default:
             printf("The command was not recognized.\n"); 

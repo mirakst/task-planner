@@ -1,5 +1,5 @@
 .vscode/tasks.json
-vscode/settings.json
+.vscode/settings.json
 test.c
 tasks.o
 tasklist.txt
@@ -9,4 +9,5 @@ README.md
 main.exe
 main
 csv maker/date-get
+csv maker/co2_get
 doc/

@@ -3,7 +3,7 @@
 /** Print a list of all non-empty tasks in the task array.
  *  @param task_list[i] Active array of task structures.
  *  @param task_amount[i] Amount of non-empty task structures in the array. */
-void Print_Task_List (task *task_list, int task_amount, struct tm time) {
+void Print_Task_List (task *task_list, int task_amount, int price_day) {
     int i;
     if (task_amount == 0) {
         printf("There are currently no tasks. Enter 'add' to begin adding some.\n"); 
@@ -23,7 +23,7 @@ void Print_Task_List (task *task_list, int task_amount, struct tm time) {
                     task_list[i].duration, 
                     task_list[i].kWh,
                     task_list[i].is_passive == 1 ? 'P' : 'A',
-                    task_list[i].days[time.tm_wday] ? 'Y' : 'N');
+                    task_list[i].days[price_day] ? 'Y' : 'N');
         }
     }
     Print_Line(0, "");
@@ -86,7 +86,7 @@ int Save_Tasks (task *task_list, int task_amount, char *file_location) {
 
     Sort_Task_List(task_list);
     for (i = 0; i < task_amount; i++) {
-        fprintf(fp, "name: %s, power: %f, duration: %.1f, passive: %d, days: %d %d %d %d %d %d %d\n",
+        fprintf(fp, "name: %-20s, power: %f, duration: %.1f, passive: %d, days: %d %d %d %d %d %d %d\n",
                 task_list[i].name, task_list[i].power, task_list[i].duration, task_list[i].is_passive,
                 task_list[i].days[0], task_list[i].days[1], task_list[i].days[2], 
                 task_list[i].days[3], task_list[i].days[4], task_list[i].days[5], 
@@ -107,7 +107,6 @@ void Reset_Task (task *p_task) {
     p_task->kWh = 0.0;
     p_task->start_hr = 0;
     p_task->end_hr = 0;
-    p_task->is_assigned = 0;
     p_task->max_price = 0;
     p_task->min_price = 0;
     p_task->total_days_yr = 0;
@@ -231,7 +230,6 @@ void Remove_Task (task *task_list, int *task_amount, int id) {
     task_list[id].is_passive = 0;
     task_list[id].start_hr = 0;
     task_list[id].end_hr = 0;
-    task_list[id].is_assigned = 0;
     task_list[id].total_days_yr = 0;
 
     *task_amount -= 1;
@@ -326,12 +324,12 @@ void Edit_Task (task *task_list, int task_amount, int task_id) {
  *  @param task_amount[i] Amount of non-empty task structures in the task array.
  *  @param task_list[i] Active array of task structures.
  *  @param time[i] Struct containing info on the current date/time. **/
-void Print_Suggestions_Day (int task_amount, task task_list[TASK_AMOUNT_MAX], struct tm time) {
+void Print_Suggestions_Day (int task_amount, task task_list[TASK_AMOUNT_MAX], int price_day) {
     int i;
     Print_Line(1, "Task Suggestions");
     printf("%-20s %-12s %-10s %-14s %-14s %-8s\n", "Task", "Status", "Hours", "Min price", "Max price", "Savings");
     for (i = 0; i < task_amount; i++) {
-        if (!task_list[i].days[time.tm_wday] || !task_list[i].min_price)
+        if (!task_list[i].min_price || !task_list[i].days[price_day])
             continue;
         printf("%-20s %3c %11.2d-%-2.2d %11.2f %14.2f %14.1f%%\n",
             task_list[i].name,
@@ -351,9 +349,9 @@ void Print_Suggestions_Day (int task_amount, task task_list[TASK_AMOUNT_MAX], st
 void Print_Suggestions_Year (int task_amount, task task_list[TASK_AMOUNT_MAX]) {
     int i;
     Print_Line(1, "Potential yearly savings");
-    printf("%-20s %-9s %12s %12s %13s\n", "Task", "Days/year", "Min price", "Max price", "Savings");
+    printf("%-20s %-9s %17s %16s %16s\n", "Task", "Days/year", "Min price", "Max price", "Savings");
     for (i = 0; i < task_amount; i++) {
-        printf("%-29s %6d %13.2f %12.2f %13.1f%%\n",
+        printf("%-20s %6d %20.2f %16.2f %15.1f%%\n",
             task_list[i].name,
             task_list[i].total_days_yr,
             task_list[i].min_price,

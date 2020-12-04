@@ -11,9 +11,10 @@ void Help_All(void) {
  * @param b[i] int, if the list should end in a line. */
 void Help_Tasks(int b) {
     Print_Line(1, "Tasks");
-    printf("%-20s -- Lists all tasks.\n", "List tasks");
-    printf("%-20s -- Add a new task.\n", "Tasks add");
-    printf("%-20s -- Remove a task\n", "Tasks remove");
+    printf("%-20s -- Lists all tasks.\n", "task list");
+    printf("%-20s -- Add a new task.\n", "task add");
+    printf("%-20s -- Remove a task\n", "task remove");
+    printf("%-20s -- Edit a task\n", "task edit");
     printf("\n");
     if(b)
         Print_Line(0, "");
@@ -25,7 +26,6 @@ void Help_Prices(int b) {
     Print_Line(1, "Prices");
     printf("%-20s -- Lists prices pr hour\n", "List prices");
     printf("%-20s -- Lists the hourly prices, sorted\n", "List prices sorted");
-    /* printf("%-20s -- Plz insert the D:\n", "Missing D"); */
     printf("\n");
     if(b)
         Print_Line(0, "");
@@ -34,14 +34,20 @@ void Help_Prices(int b) {
 /** Prints a list of helpful commands for User_Details. 
  * @param b[i] int, if the list should end in a line. */
 void Help_Settings(int b) {
-    Print_Line(1, "User details");
-    printf("%-20s -- Changes the name in the user details.\n", "Set name");
-    printf("%-20s -- Changes the available hours in user details.\n", "Set hours");
-    printf("%-20s -- Resets the schedule.\n", "Reset hours");
-    printf("%-20s -- Saves the the user details to a file.\n", "Save");
-    printf("%-20s -- Enables recommendation outside available hours\n", "Recommend");
+    Print_Line(1, "Settings");
+    printf("%-20s -- Enter the settings menu.\n", "Settings");
     printf("\n");
     if(b)
         Print_Line(0, "");
 }
-    
+
+void Help_Settings_Extended(void) {
+    Print_Line(1, "Settings  Detailed");
+    printf("1: Display all the current settings\n"
+           "2: Change the current name of your profile\n"
+           "3: Insert another interval into your schedule\n"
+           "4: Reset your entire schedule so every hour is occupied\n"
+           "5: Set whether you want tasks recommended outside of your schedule\n"
+           "6: Save all your settings for further use\n");
+    Print_Line(0, "");
+}

@@ -22,7 +22,6 @@
  *  @param power Double that contains the power of the task. 
  *  @param kWh Double that contains the power consumption of the task.
  *  @param duration Double that contains the amount of time the task takes to complete.
- *  @param is_assigned Boolean that decides if a task is assigned to a start hour.
  *  @param start_hr Int for the start time of the task.
  *  @param end_hr Int for the end time of the task.
  *  @param days[] An array of the days in a week (there are 7).
@@ -36,8 +35,7 @@ typedef struct task {
            duration;
     
     /* Assignment */
-    int is_assigned,
-        start_hr,
+    int start_hr,
         end_hr,
         days[7],
         total_days_yr;
@@ -63,8 +61,8 @@ void Set_Task_Days (int *);
 
 void Sort_Task_List (task *);
 int Compare_Tasks (const void *, const void *);
-void Print_Task_List(task *, int, struct tm);
-void Print_Suggestions_Day (int, task[TASK_AMOUNT_MAX], struct tm);
+void Print_Task_List(task *, int, int);
+void Print_Suggestions_Day (int, task[TASK_AMOUNT_MAX], int);
 void Print_Suggestions_Year (int, task[TASK_AMOUNT_MAX]);
 double Fixed_Percent(double, double);
 
