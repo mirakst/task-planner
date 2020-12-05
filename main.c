@@ -283,13 +283,10 @@ int  Should_Skip_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY
             return 1;
     
     /* Prevent active tasks from ending outside the user's available hours */
-    if (!p_task->is_passive) {
-        for (i = start_hr; i != end_hr; i++) {
-            i = Wrap_Hour(i);
-            if (!user.available_hours[i] || (!do_year ? assigned_hours[i] : 0))
+    if (!p_task->is_passive) 
+        for (i = start_hr; i != end_hr; i++) 
+            if ((!user.available_hours[i] && !user.is_available) || (!do_year ? assigned_hours[i] : 0)) 
                 return 1;
-        }
-    }
     return 0;
 }
 
