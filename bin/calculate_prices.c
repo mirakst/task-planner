@@ -22,15 +22,19 @@ int Calculate_kWh_Data (double data[][2], int sort, int day, int use_emissions) 
 }
 
 /** Reads a line in the input data file based on the input day, and assign the hourly prices to the price array.
- *  @param fp[i] File with price data.
- *  @param prices[i/o] 2D array of doubles containing the prices for each hour in a day (1-24).
- *  @param day[i] The day prices should be loaded from (1-365). */
+ *  @param fp[i] File with price or emission data.
+ *  @param data[i/o] 2D array of doubles containing the price or emission for each hour in a day (1-24).
+ *  @param day[i] The day prices or emissions should be loaded from (1-365). */
 void Load_kWh_Data (FILE *fp, double data[][2], int day) {
     int i;
     double value;
-
-    for (i = 1; i < day; i++)
-        fscanf(fp, "%*[^\n] %*[^ ]");
+    
+    do {
+        if (day > 1)
+            fscanf(fp, "%*[^\n] ");
+        fscanf(fp, "%*[^ ]");
+        i++;
+    } while (i < day);
 
     for (i = 0; i < HOURS_PER_DAY + 6; i++) {
         if (i != 24) 

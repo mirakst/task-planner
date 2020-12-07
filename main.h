@@ -13,6 +13,7 @@
 #include "bin/user_details.h"
 #include "bin/graphics.h"
 #include "bin/help.h"
+#include "bin/get_input.h"
 
 #define FUCKING_BIG_ASS_NUMBER 10000.0
 #define INPUT_MAX 30

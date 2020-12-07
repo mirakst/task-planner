@@ -1,32 +1,36 @@
 #include "tasks.h"
+#include "help.h"
 
 /** Print a list of all non-empty tasks in the task array.
  *  @param task_list[i] Active array of task structures.
  *  @param task_amount[i] Amount of non-empty task structures in the array. */
 void Print_Task_List (task *task_list, int task_amount, int current_day) {
     int i;
+    char type[3] = {'A', 'P', 'T'};
+
     if (task_amount == 0) {
-        printf("There are currently no tasks. Enter 'add' to begin adding some.\n"); 
+        printf("There are currently no tasks. Enter 'task add' to begin adding some.\n"); 
         return;
     }
 
     Sort_Task_List(task_list);
 
-    Print_Line(1, "Tasklist");
+    Print_Line(1, "Task list");
     printf("%7s%6s%23s%14s%15s%9s%8s\n", "ID", "Name", "Power", "Duration", "Energy usage", "Status", "Today?");
     for (i = 0; i < TASK_AMOUNT_MAX; i++) {
-        if (strcmp(task_list[i].name, EMPTY_TASK_NAME) != 0) {
+        if (strcmp(task_list[i].name, EMPTY_TASK_NAME) != 0) {            
             printf("Task %2d: %-20s %4.1f kW %8.1f hrs %10.3f kWh %6c %6c\n", 
                     (i + 1),
                     task_list[i].name, 
                     task_list[i].power,
                     task_list[i].duration, 
                     task_list[i].kWh,
-                    task_list[i].is_passive == 1 ? 'P' : 'A',
+                    type[task_list[i].type],
                     task_list[i].days[current_day] ? 'Y' : 'N');
         }
     }
     Print_Line(0, "");
+    printf("Hint: Use command 'suggest' to receive suggestions on when to do your tasks today!\n");
 }
 
 /** Load tasks from the config file.
@@ -45,7 +49,7 @@ int Load_Tasks (task *task_list, int *task_amount, char *file_location) {
                task_list[*task_amount].name,
                &task_list[*task_amount].power,
                &task_list[*task_amount].duration,
-               &task_list[*task_amount].is_passive,
+               &task_list[*task_amount].type,
                &task_list[*task_amount].days[0],
                &task_list[*task_amount].days[1],
                &task_list[*task_amount].days[2],
@@ -86,8 +90,8 @@ int Save_Tasks (task *task_list, int task_amount, char *file_location) {
 
     Sort_Task_List(task_list);
     for (i = 0; i < task_amount; i++) {
-        fprintf(fp, "name: %-20s, power: %f, duration: %.1f, passive: %d, days: %d %d %d %d %d %d %d\n",
-                task_list[i].name, task_list[i].power, task_list[i].duration, task_list[i].is_passive,
+        fprintf(fp, "name: %s, power: %f, duration: %.1f, passive: %d, days: %d %d %d %d %d %d %d\n",
+                task_list[i].name, task_list[i].power, task_list[i].duration, task_list[i].type,
                 task_list[i].days[0], task_list[i].days[1], task_list[i].days[2], 
                 task_list[i].days[3], task_list[i].days[4], task_list[i].days[5], 
                 task_list[i].days[6]);
@@ -101,7 +105,7 @@ int Save_Tasks (task *task_list, int task_amount, char *file_location) {
  *  @param p_task[o] Pointer to a task structure to be reset. */
 void Reset_Task (task *p_task) {
     strcpy(p_task->name, EMPTY_TASK_NAME);
-    p_task->is_passive = 0;
+    p_task->type = active;
     p_task->power = 0.0;
     p_task->duration = 0.0; 
     p_task->kWh = 0.0;
@@ -127,18 +131,11 @@ void Add_Task (task *task_list, int *task_amount) {
     Set_Task_Name(task_list[id].name);
     Set_Task_Power(&task_list[id].power);
     Set_Task_Duration(&task_list[id].duration);
-    Set_Task_Status(&task_list[id].is_passive);
+    Set_Task_Status(&task_list[id].type);
     Set_Task_Days(task_list[id].days);
-
     task_list[id].kWh = Calculate_kWh(task_list[id]);
+
     *task_amount += 1;
-
-    if(!strcmp(task_list[id].name, EMPTY_TASK_NAME) || task_list[id].power <= 0 || task_list[id].duration <= 0) {
-        printf("Error in user input, cancelling...\n"); 
-        Reset_Task(&task_list[id]);
-        return;
-    }
-
     printf("Task: %s was successfully added.\n", task_list[id].name);
     Sort_Task_List(task_list);
 }
@@ -146,66 +143,47 @@ void Add_Task (task *task_list, int *task_amount) {
 /** Changes the name of a task.
  *  @param name[i] String that contains the name of the task. */
 void Set_Task_Name (char *name) {
-    printf("Task name (max %d): ", TASK_NAME_MAX - 1);
-    fgets(name, TASK_NAME_ALLOC, stdin);
-    strtok(name, "\n");
-    name[TASK_NAME_MAX - 1] = '\0'; 
+    do {
+        printf("Task name (max %d): ", TASK_NAME_MAX - 1);
+        fgets(name, TASK_NAME_ALLOC, stdin);
+        strtok(name, "\n");  
+        name[TASK_NAME_MAX - 1] = '\0';
+    } while (!strcmp(name, EMPTY_TASK_NAME));
 }
 
 /** Changes the power of a task.
  *  @param power[i] Power usage of the task (in Watts). */
 void Set_Task_Power (double *power) {
-    char temp_string[TASK_NAME_MAX];
     printf("Power usage (watts): ");
-    fgets(temp_string, TASK_NAME_MAX, stdin);
-    sscanf(temp_string, " %lf", power);
+    *power = Get_Double_Input (TASK_POWER_MAX);
     *power /= W_PER_KW;
 }
 
 /** Changes the duration of a task.
  *  @param duration[i] Duration of the task (in hours). */
 void Set_Task_Duration (double *duration) {
-    char temp_string[TASK_NAME_MAX];
-    printf("Task duration (min): ");
-    fgets(temp_string, TASK_NAME_MAX, stdin);
-    sscanf(temp_string, " %lf", duration);
+    printf("Task duration (minutes): ");
+    *duration = Get_Double_Input (TASK_DURATION_MAX);
     *duration /= MIN_PER_HOUR;
 }
 
 /** Changes the status of a task.
- *  @param is_passive[i] Boolean that represents whether the task is passive or not (true = 1, false = 0). */
-void Set_Task_Status (int *is_passive) {
-    char temp_string[TASK_NAME_MAX],
-         bool_input;
-        
-    printf("Is the task passive? (y/n): ");
-    fgets(temp_string, TASK_NAME_MAX, stdin);
-    sscanf(temp_string, " %c", &bool_input);
-        
-    if (tolower(bool_input) == 'y')
-        *is_passive = 1;
-    else 
-        *is_passive = 0;
+ *  @param type[i] enum value that represents task type (0 = active, 1 = Passive, 2 = Timed). */
+void Set_Task_Status (int *type) {
+    printf("Choose the task type (1 = Active, 2 = Passive, 3 = Timed): ");
+    *type = (int)Get_Double_Input(3) - 1;
 }
 
 /** Changes the weekdays that a task is done.
  *  @param days[o] Array of booleans that decide whether a task is done on a certain weekday (true = 1, false = 0). */
 void Set_Task_Days (int days[7]) {
-    char temp_string[TASK_NAME_MAX],
-         *weekdays[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-    char bool_input;
+    char *weekdays[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
     int i = 0;
 
-    printf("What days should the task be done? (y/n)\n");
+    printf("Do task on day? (y/n)\n");
     for (i = 0; i < 7; i++) {
-        printf("%s: ", weekdays[i]);
-        fgets(temp_string, TASK_NAME_MAX, stdin);
-        sscanf(temp_string, " %c", &bool_input);
-            
-        if (tolower(bool_input) == 'y')
-            days[i] = 1;
-        else 
-            days[i] = 0;
+        printf("%-12s: ", weekdays[i]);
+        days[i] = Get_Bool_Input();
     }
 }
 
@@ -228,7 +206,7 @@ void Remove_Task (task *task_list, int *task_amount, int id) {
     task_list[id].power = 0.0;
     task_list[id].duration = 0.0;
     task_list[id].kWh = 0.0;
-    task_list[id].is_passive = 0;
+    task_list[id].type = active;
     task_list[id].start_hr = 0;
     task_list[id].end_hr = 0;
     task_list[id].total_days_yr = 0;
@@ -287,38 +265,42 @@ void Edit_Task (task *task_list, int task_amount, int task_id) {
             "3: Set duration\n"
             "4: Set status\n"
             "5: Set days of occurrence\n"
+            "6: More info\n"
             "0: Go back\n");
     Print_Line(0, "");
     
-    do {
-        printf("Choose a setting: ");
-        fgets(temp_string, 5, stdin);
-        sscanf(temp_string, " %d\n", &input);
+    printf("Choose a setting: ");
+    fgets(temp_string, 5, stdin);
+    sscanf(temp_string, " %d\n", &input);
 
-        switch (input) {
-        case 0:
-            printf("Exiting task settings.\n");
-            return;
-        case 1:
-            Set_Task_Name(task_list[id].name);
-            break;
-        case 2:
-            Set_Task_Power(&task_list[id].power);
-            break;
-        case 3:
-            Set_Task_Duration(&task_list[id].duration);
-            break;
-        case 4:
-            Set_Task_Status(&task_list[id].is_passive);
-            break;
-        case 5:
-            Set_Task_Days(task_list[id].days);
-            break;
-        default:
-            printf("The command was not recognized.\n"); 
-            break;
-        }
-    } while (input);
+    switch (input) {
+    case 0:
+        printf("Exiting task settings.\n");
+        return;
+    case 1:
+        Set_Task_Name(task_list[id].name);
+        break;
+    case 2:
+        Set_Task_Power(&task_list[id].power);
+        task_list[id].kWh = Calculate_kWh(task_list[id]);
+        break;
+    case 3:
+        Set_Task_Duration(&task_list[id].duration);
+        task_list[id].kWh = Calculate_kWh(task_list[id]);
+        break;
+    case 4:
+        Set_Task_Status(&task_list[id].type);
+        break;
+    case 5:
+        Set_Task_Days(task_list[id].days);
+        break;
+    case 6:
+        Help_Tasks_Extended();
+        break;
+    default:
+        printf("The command was not recognized.\n"); 
+        break;
+    }
 }
 
 /** Prints the suggested starting times and potential savings for all tasks.
@@ -327,6 +309,7 @@ void Edit_Task (task *task_list, int task_amount, int task_id) {
  *  @param time[i] Struct containing info on the current date/time. **/
 void Print_Suggestions_Day (int task_amount, task task_list[TASK_AMOUNT_MAX], int current_day, int use_emissions) {
     int i;
+    char type[3] = {'A', 'P', 'T'};
 
     Print_Line(1, "Task Suggestions");
     printf("%-20s %-12s %-10s %-14s %-14s %-8s\n", "Task", "Status", "Hours", "Min value", "Max value", "Savings");
@@ -336,7 +319,7 @@ void Print_Suggestions_Day (int task_amount, task task_list[TASK_AMOUNT_MAX], in
 
         printf("%-20s %3c %11.2d-%-2.2d %14.2f %s %10.2f %s %7.1f%%\n",
             task_list[i].name,
-            task_list[i].is_passive ? 'P' : 'A',
+            type[task_list[i].type],
             task_list[i].start_hr,
             task_list[i].end_hr,
             task_list[i].min_value,

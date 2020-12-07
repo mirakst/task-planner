@@ -13,12 +13,13 @@
 typedef struct User_Details {
     int available_hours[HOURS_PER_DAY];
     char user_name [USERNAME_MAX];
-    int has_name,
-        has_set_hours,
-        ignore_availability,
-        xXxcumShotxXx;
+    int ignore_availability,
+        use_emissions;
 } User;
 
+void Reset_User (User *user);
+int Get_Bool_Input(void);
+double Get_Double_Input(int);
 void First_Time_Setup (User *);
 void Get_Name (User *);
 void Reset_Available_Hours (int[HOURS_PER_DAY]);
