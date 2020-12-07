@@ -13,6 +13,7 @@
 #define TASK_NAME_MAX           21
 #define MIN_PER_HOUR            60
 #define W_PER_KW                1000
+#define G_PER_KG                1000
 #define READ_LINE_MAX           100
 
 /** The task structure.
@@ -25,8 +26,8 @@
  *  @param start_hr Int for the start time of the task.
  *  @param end_hr Int for the end time of the task.
  *  @param days[] An array of the days in a week (there are 7).
- *  @param min_price Double for the minimum price of completing the task.
- *  @param max_price Double for the maximum price of completing the task. */
+ *  @param min_value Double for the minimum value of completing the task.
+ *  @param max_value Double for the maximum value of completing the task. */
 typedef struct task {
     int is_passive;
     char name[TASK_NAME_MAX];
@@ -39,8 +40,8 @@ typedef struct task {
         end_hr,
         days[7],
         total_days_yr;
-    double min_price,
-           max_price;
+    double min_value,
+           max_value;
 } task;
 
 double Calculate_kWh (task);
@@ -62,9 +63,10 @@ void Set_Task_Days (int *);
 void Sort_Task_List (task *);
 int Compare_Tasks (const void *, const void *);
 void Print_Task_List(task *, int, int);
-void Print_Suggestions_Day (int, task[TASK_AMOUNT_MAX], int);
-void Print_Suggestions_Year (int, task[TASK_AMOUNT_MAX]);
+void Print_Suggestions_Day (int, task[TASK_AMOUNT_MAX], int, int);
+void Print_Suggestions_Year (int, task[TASK_AMOUNT_MAX], int);
 double Fixed_Percent(double, double);
 
 /* Testing */
 void Test_KW(void);
+void Test_Fixed_Percent(void);

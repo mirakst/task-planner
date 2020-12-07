@@ -1,5 +1,20 @@
 #include "help.h"
 
+/* Startup help */
+void Print_Welcome (void) {
+    Print_Line(1, "Welcome!");
+    printf("This program is designed to help the user with scheduling power-consuming tasks at\n"
+           "times that are most environmentally friendly, or cheapest, based on user settings.\n\n"
+           "Begin adding a task with the command 'task add'. Enter 'task list' for a list of  \n"
+           "all tasks.                                                                        \n\n");
+    printf("The user settings include an interval of hours where the user is available (and   \n"
+           "can start tasks), and a switch to toggle whether this interval should be ignored  \n"
+           "or not when suggesting tasks.                                                     \n"
+           "These settings can be changed at any time by entering 'settings'.                 \n");
+    printf("Enter 'help' for a detailed list of all commands.                                 \n");
+    Print_Line(0, "");
+}
+
 /** Calls all the other help functions. */
 void Help_All(void) {
     Help_Tasks(0);

@@ -14,17 +14,15 @@
 #include "bin/graphics.h"
 #include "bin/help.h"
 
+#define FUCKING_BIG_ASS_NUMBER 10000.0
 #define INPUT_MAX 30
 #define DAYS_PER_YEAR 365
-#define FIRST_WEEKDAY_OF_YEAR 3
+#define FIRST_WEEKDAY_OF_YEAR 5
 #define DAYS_PER_WEEK 7
 
 /* Commands */
 #define EXIT                  "exit\n"
-#define LIST_PRICES           "list prices\n"
-#define LIST_EMISSIONS        "list emissions\n"
-#define LIST_EMISSIONS_SORTED "list emissions sorted\n"
-#define LIST_PRICES_SORTED    "list prices sorted\n" /* Muligvis ubrugt */
+#define LIST_DATA             "list data\n"
 #define LIST_TASKS            "task list\n"
 #define HELP                  "help\n"
 #define HELP_TASKS            "help task\n"
@@ -42,26 +40,24 @@
 typedef enum Commands {_exit, unrecognized,
                        help, help_tasks, help_prices, help_settings,
                        settings, change_day, save_user,
-                       list_prices, list_prices_sorted, list_emissions, list_emissions_sorted,
+                       list_data, list_data_sorted,
                        list_tasks, add_task, remove_task, edit_task,
                        suggest, suggest_year
                        } Commands;
 
 /* Prototypes */
-void Initialize (double[][2], double[][2], double[][2], double[][2], User *, task[TASK_AMOUNT_MAX], int *, int *);
+void Initialize(double[][2], User *, task[TASK_AMOUNT_MAX], int *, int *);
 void Save (User, task[TASK_AMOUNT_MAX], int);
-void Find_Lowest_Price (User, task *, int[HOURS_PER_DAY], double[][2], int);
-void Suggest_Day (User, task[TASK_AMOUNT_MAX], int, double[][2], double[][2], int);
-void Suggest_Year (User, task[TASK_AMOUNT_MAX], int, double[][2], double[][2], int); 
-int Should_Skip_Hour (User, task *, int[HOURS_PER_DAY], int, int, int);
+void Suggest_Day (User, task[TASK_AMOUNT_MAX], int, double[][2], int);
+void Suggest_Year (User, task[TASK_AMOUNT_MAX], int, double[][2], int); 
+void Find_Start_Hour (User, task *, int[HOURS_PER_DAY], double[][2], int, int);
+int Should_Skip_Hour (User, task *, int[HOURS_PER_DAY], int, int, int, int);
 void Assign_Task (task *, int, int, double, double, int[HOURS_PER_DAY], int);
 
 /* Test functions */
 void Test_All(void);
 void Test_Wrap_Hours(void);
 void Test_Day_To_Weekday(void);
-void Test_Fixed_Percent(void);
-void Test_Fixed_Percent(void);
 
 /** Converts the input string to lower case
  *  @param str[i/o] The string to be made lowercase. */
@@ -89,14 +85,8 @@ int Get_Command_From_String(char *str) {
         return settings;
     else if (!strcmp(str, SAVE_USER))
         return save_user;
-    else if (!strcmp(str, LIST_PRICES))
-        return list_prices;
-    else if (!strcmp(str, LIST_PRICES_SORTED))
-        return list_prices_sorted;
-    else if (!strcmp(str, LIST_EMISSIONS))
-        return list_emissions;
-    else if (!strcmp(str, LIST_EMISSIONS_SORTED))
-        return list_emissions_sorted;
+    else if (!strcmp(str, LIST_DATA))
+        return list_data;
     else if (!strcmp(str, CHANGE_DAY))
         return change_day;
     else if (!strcmp(str, LIST_TASKS))
@@ -132,7 +122,7 @@ int Wrap_Hour (int hour) {
     return (hour >= HOURS_PER_DAY) ? (hour - HOURS_PER_DAY) : hour;
 }
 
-/** Converts the input day to its weekday (2019).
+/** Converts the input day to its weekday.
  *  @param day[i] Day to be converted.
  *  @return Returns the input day as a weekday (0-6). */
 int Day_To_Weekday (int day) {

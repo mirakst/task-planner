@@ -3,6 +3,7 @@
 #include "graphics.h"
 
 /* Help functions called by commands */
+void Print_Welcome (void);
 void Help_All(void);
 void Help_Tasks(int);
 void Help_Prices(int);

@@ -6,30 +6,28 @@
  */
 #include "main.h"
 
+/* Få lavet task-menu? */
+
 int main(void) {
     User user;
     char cmd_input[INPUT_MAX];
-    double prices[HOURS_PER_DAY + 6][2],
-           prices_sorted[HOURS_PER_DAY + 6][2],
-           emissions[HOURS_PER_DAY + 6][2],
-           emissions_sorted[HOURS_PER_DAY + 6][2];
+    double active_data[HOURS_PER_DAY + 6][2];
     task task_list[TASK_AMOUNT_MAX];
     int task_amount = 0,
         task_id = 0,
         cmd,
-        price_day;
+        current_day;
 
     Test_All();
-    Initialize(prices, prices_sorted, emissions, emissions_sorted, &user, task_list, &task_amount, &price_day);
-    Help_All();
+    Initialize(active_data, &user, task_list, &task_amount, &current_day);
 
     do {
         cmd = Get_User_Input(cmd_input);
 
         switch (cmd) {
-        case _exit: 
+        case _exit:
             printf("Exiting...\n"); break;
-        case help:  
+        case help:
             Help_All(); break;
         case help_prices:
             Help_Prices(1); break;
@@ -38,24 +36,19 @@ int main(void) {
         case help_settings:
             Help_Settings(1); break;
         case settings:
-            Print_Settings(&user); break;
+            Print_Settings(&user);
+            Calculate_kWh_Data(active_data, 0, current_day, user.xXxcumShotxXx); break;
         case save_user:
             Save(user, task_list, task_amount); break;
-        case list_prices:
-            List_kWh_Data(prices, 1); break;
-        case list_prices_sorted:
-            List_kWh_Data(prices_sorted, 1); break;
-        case list_emissions:
-            List_kWh_Data(emissions, 0); break;
-        case list_emissions_sorted:
-            List_kWh_Data(emissions_sorted, 0); break;
+        case list_data:
+            List_kWh_Data(active_data, user.xXxcumShotxXx); break;
         case change_day:
-            Change_Day(prices, emissions, &price_day); break;
+            Change_Day(active_data, &current_day, user.xXxcumShotxXx); break;
         case list_tasks:
-            Print_Task_List(task_list, task_amount, Day_To_Weekday(price_day)); break;
+            Print_Task_List(task_list, task_amount, Day_To_Weekday(current_day)); break;
         case add_task:
             Add_Task(task_list, &task_amount); break;
-            
+        
         case remove_task:
             if (sscanf(cmd_input, " %*s %*s %d", &task_id) == 1)
                 Remove_Task(task_list, &task_amount, task_id);
@@ -71,9 +64,9 @@ int main(void) {
             break;
 
         case suggest:
-            Suggest_Day (user, task_list, task_amount, prices, emissions, price_day); break;
+            Suggest_Day (user, task_list, task_amount, active_data, current_day); break;
         case suggest_year:
-            Suggest_Year (user, task_list, task_amount, prices, emissions, price_day); break;
+            Suggest_Year (user, task_list, task_amount, active_data, current_day); break;
             
         default:
             printf("Command not recognized. Type 'help for the list of commands.\n"); break;
@@ -85,28 +78,26 @@ int main(void) {
     return EXIT_SUCCESS;
 }
 
-/* p og e er uoverskueligt !!!!!!!! -anders (dumpap) */
 /** Performs all necessary initialization and loading of structs and variables.
  *  @param p[i/o] Unsorted array of prices.
  *  @param p_sorted[i/o] Sorted array of prices.
  *  @param user[i/o] Pointer to the user structure with all user details.
  *  @param task_list[i/o]  Active array of tasks. 
  *  @param task_amount[i/o] Amount of non-empty tasks in the task array. */
-void Initialize(double p[][2], double p_sorted[][2], double e[][2], double e_sorted[][2], User *user, task task_list[TASK_AMOUNT_MAX], int *task_amount, int *price_day) {
+void Initialize(double data[][2], User *user, task task_list[TASK_AMOUNT_MAX], int *task_amount, int *current_day) {
     time_t t = time(NULL);
     struct tm time = *localtime(&t);
     int file_status = 0,
         i;
     char *weekday[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
-    *price_day = time.tm_yday;
+         *current_day = time.tm_yday;
     
     /* Attempts to load price and emission data. Terminates if there are none */
-    file_status = Calculate_kWh_Data(p, e, 0, *price_day);
+    file_status = Calculate_kWh_Data(data, 0, *current_day, user->xXxcumShotxXx);
     if (!file_status) {
-        printf("Could not load prices. Exiting...\n");
+        printf("Could not load data. Exiting...\n");
         exit(EXIT_FAILURE);
     }
-    Calculate_kWh_Data(p_sorted, e_sorted, 1, *price_day);
 
     /* Attempt to load user details. Starts setup if there is no file */
     user->has_set_hours = 0;
@@ -114,6 +105,7 @@ void Initialize(double p[][2], double p_sorted[][2], double e[][2], double e_sor
 
     file_status = Load_User_Details(user);
     if (file_status != 1) {
+        Print_Welcome();
         First_Time_Setup(user);
         Save_User_Details(*user);
     }
@@ -141,12 +133,14 @@ void Initialize(double p[][2], double p_sorted[][2], double e[][2], double e_sor
  *  @param task_list[i] Active array of task structures.
  *  @param task_amount[i] Amount of non-empty task structures in the task array. */
 void Save(User user, task task_list[TASK_AMOUNT_MAX], int task_amount) {
-    if (Save_User_Details(user) != 1) {
-        printf("Failed to save user settings.\n");
+    int save_res = Save_User_Details(user);
+    if (save_res != 1) {
+        printf("Failed to save user settings. Error code: %d\n", save_res);
         return;
     }
-    if (Save_Tasks(task_list, task_amount, FILE_TASKLIST) == -1) {
-        printf("Failed to save tasks.\n");
+    save_res = Save_Tasks(task_list, task_amount, FILE_TASKLIST);
+    if (save_res == -1) {
+        printf("Failed to save tasks. Error code %d\n", save_res);
         return;
     }
     printf("Saved tasks and settings successfully.\n");
@@ -157,20 +151,20 @@ void Save(User user, task task_list[TASK_AMOUNT_MAX], int task_amount) {
  *  @param task_list[][i] Array of task structures.
  *  @param task_amount[i] Amount of task structures in the task array.
  *  @param p[][][i] Unsorted array of prices.
- *  @param price_day[i] The day that prices are loaded from. Can be edited for debugging. */
-void Suggest_Day (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, double p[][2], double e[][2], int price_day) {
+ *  @param current_day[i] The day that prices are loaded from. Can be edited for debugging. */
+void Suggest_Day (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, double data[][2], int current_day) {
     int *assigned_hours = calloc(HOURS_PER_DAY, sizeof(int));
     int i;
 
     for (i = 0; i < task_amount; i++) {
-        task_list[i].max_price = 0;
-        task_list[i].min_price = 0;
-        if (!task_list[i].days[Day_To_Weekday(price_day)]) {
+        task_list[i].max_value = 0;
+        task_list[i].min_value = 0;
+        if (!task_list[i].days[Day_To_Weekday(current_day)]) {
             continue;
         }
-        Find_Lowest_Price (user, &task_list[i], assigned_hours, p, 0);  
+        Find_Start_Hour (user, &task_list[i], assigned_hours, data, current_day, 0);
     }
-    Print_Suggestions_Day (task_amount, task_list, Day_To_Weekday(price_day));
+    Print_Suggestions_Day (task_amount, task_list, Day_To_Weekday(current_day), user.xXxcumShotxXx);
 }
 
 /** Calculates the savings if the plan is followed for a year
@@ -178,61 +172,65 @@ void Suggest_Day (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, d
  *  @param task_list[][i] Array of task structures.
  *  @param task_amount[i] Amount of task structures in the task array.
  *  @param p[][][i] Unsorted array of prices.
- *  @param price_day[i] The day that prices are loaded from. Can be edited for debugging. */
-void Suggest_Year (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, double p[][2], double e[][2], int price_day) {
+ *  @param current_day[i] The day that prices are loaded from. Can be edited for debugging. */
+void Suggest_Year (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, double data[][2], int current_day) {
     int *assigned_hours = calloc(HOURS_PER_DAY, sizeof(int));
     int i, day;
     
     /* Reset the relevant task variables */
     for (i = 0; i < task_amount; i++) {
-        task_list[i].max_price = 0;
-        task_list[i].min_price = 0;
+        task_list[i].max_value = 0;
+        task_list[i].min_value = 0;
         task_list[i].total_days_yr = 0;
     }
 
     for (day = 1; day <= DAYS_PER_YEAR; day++) {
-        Calculate_kWh_Data(p, e, 0, day);
+        Calculate_kWh_Data(data, 0, day, user.xXxcumShotxXx);
 
         for (i = 0; i < task_amount; i++) {
             if (!task_list[i].days[Day_To_Weekday(day)])
                 continue;
-            Find_Lowest_Price (user, &task_list[i], assigned_hours, p, 1);
+            Find_Start_Hour (user, &task_list[i], assigned_hours, data, current_day, 1);
             task_list[i].total_days_yr++;
         }
     }
-    Print_Suggestions_Year (task_amount, task_list);
-    Calculate_kWh_Data (p, e, 0, price_day);
+    Print_Suggestions_Year (task_amount, task_list, user.xXxcumShotxXx);
+    Calculate_kWh_Data (data, 0, current_day, user.xXxcumShotxXx);
 }
 
-/** Finds the starting time with the lowest average price over the task duration.
+/** Finds the starting hour with the lowest average price/emission over the task duration.
  *  @param user[i] User structure with all user details.
  *  @param p_task[i/o] Pointer to a task structure.
  *  @param assigned_hours[][i] Sees if there is an active task on the hour.
  *  @param p[][][i] Unsorted array of prices.
  *  @param do_year[i] Boolean to determine whether the yearly or daily savings should be calculated (true = 1, false = 0). */
-void Find_Lowest_Price (User user, task *p_task, int assigned_hours[HOURS_PER_DAY], double p[][2], int do_year) {
+void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY], double data[][2], int day, int do_year) {
     int i, j,
         duration,
         end_hr = 0,
         best_hr_start = 0,
         best_hr_end = 0,
         should_skip_hr = 0;
-    double cur_price = 0.0,
-           price_avg = 0.0,
-           price_avg_max = 0.0,
-           price_avg_min = 100.0,
-           price_min = 0.0, 
-           price_max = 0.0;
+    double cur_value = 0.0,
+           value_avg = 0.0,
+           value_avg_max = 0.0,
+           value_avg_min = FUCKING_BIG_ASS_NUMBER,
+           value_min = 0.0, 
+           value_max = 0.0;
 
     duration = (int) ceil(p_task->duration);
 
     for (i = 0; i < HOURS_PER_DAY; i++) {
         /* Calculate end hour for the task and reset variables for each hour */
-        end_hr = Wrap_Hour(i + duration);
+        if (day == 365)
+            end_hr = Wrap_Hour(i + duration);
+        else
+            end_hr = i + duration;
+        
         should_skip_hr = 0;
-        cur_price = 0.0;
+        cur_value = 0.0;
 
-        should_skip_hr = Should_Skip_Hour(user, p_task, assigned_hours, i, end_hr, do_year);
+        should_skip_hr = Should_Skip_Hour(user, p_task, assigned_hours, day, i, end_hr, do_year);
 
         /* If the user is available in this hour, calculate the avg price values and attempt to assign them */
         if(!should_skip_hr) {
@@ -240,20 +238,20 @@ void Find_Lowest_Price (User user, task *p_task, int assigned_hours[HOURS_PER_DA
                 /* Handle 'overflowing' hours */
                 /* Eks. duration = 3, p_task->duration = 2.5, så skal den sidste times pris ganges med den resterende længde af tasken (0.5 timer) */
                 if (p_task->duration > j && p_task->duration < (j + 1)) 
-                    cur_price += p_task->power * (p_task->duration - j) * p[i + j][0];
+                    cur_value += p_task->power * (p_task->duration - j) * data[i + j][0];
                 else
-                    cur_price += p_task->power * p[i + j][0];
+                    cur_value += p_task->power * data[i + j][0];
             }
             
-            price_avg = cur_price / duration;
-            
-            if (price_avg > price_avg_max) {
-                price_avg_max = price_avg;
-                price_max = cur_price;
+            value_avg = cur_value / duration;
+
+            if (value_avg > value_avg_max) {
+                value_avg_max = value_avg;
+                value_max = cur_value;
             }
-            else if (price_avg <= price_avg_min) {
-                price_avg_min = price_avg;
-                price_min = cur_price;
+            if (value_avg < value_avg_min) {
+                value_avg_min = value_avg;
+                value_min = cur_value;
                 best_hr_start = i;
                 best_hr_end = Wrap_Hour(best_hr_start + j);
             }
@@ -261,11 +259,11 @@ void Find_Lowest_Price (User user, task *p_task, int assigned_hours[HOURS_PER_DA
     }
     
     /* If price_min is unchanged, assume that no start hour was found */
-    if (price_avg_min == 100 && !do_year) {
+    if (value_avg_min == 100 && !do_year) {
         printf("Could not find a suitable start hour for task %s\n", p_task->name);
         return;
     }
-    Assign_Task(p_task, best_hr_start, best_hr_end, price_min, price_max, assigned_hours, do_year);
+    Assign_Task(p_task, best_hr_start, best_hr_end, value_min, value_max, assigned_hours, do_year);
 }
 
 /** Checks whether a task can be assigned in the given start_hr and end_hr interval or not.
@@ -275,18 +273,21 @@ void Find_Lowest_Price (User user, task *p_task, int assigned_hours[HOURS_PER_DA
  *  @param start_hr[i] The start hour that is being checked for the given task.
  *  @param end_hr[i] The end hour that is being checked for the given task.
  *  @param do_year[i] Boolean to determine whether the yearly or daily savings should be calculated (true = 1, false = 0). */
-int  Should_Skip_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY], int start_hr, int end_hr, int do_year) {
+int Should_Skip_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY], int day, int start_hr, int end_hr, int do_year) {
     int i;
 
     /* Skip to next start hour if the user is unavailable and does not want to use all hours */
-    if (!user.is_available && !user.available_hours[start_hr])
+    if (!user.ignore_availability && !user.available_hours[start_hr])
             return 1;
     
     /* Prevent active tasks from ending outside the user's available hours */
     if (!p_task->is_passive) 
-        for (i = start_hr; i != end_hr; i++) 
-            if ((!user.available_hours[i] && !user.is_available) || (!do_year ? assigned_hours[i] : 0)) 
-                return 1;
+        for (i = start_hr; i != end_hr; i++) {
+            if (day == 365)
+                i = Wrap_Hour(i);
+            if ((!user.ignore_availability && !user.available_hours[Wrap_Hour(i)]) || (!do_year ? assigned_hours[Wrap_Hour(i)] : 0)) 
+                return 1; 
+        }
     return 0;
 }
 
@@ -302,14 +303,14 @@ void Assign_Task (task *p_task, int start_hr, int end_hr, double price_min, doub
     int i;
     
     if (do_year) { 
-        p_task->min_price += price_min;
-        p_task->max_price += price_max;
+        p_task->min_value += price_min;
+        p_task->max_value += price_max;
     }
     else {
         p_task->start_hr = start_hr;
         p_task->end_hr = end_hr;
-        p_task->min_price = price_min;
-        p_task->max_price = price_max;
+        p_task->min_value = price_min;
+        p_task->max_value = price_max;
 
         if (!p_task->is_passive) {
             for (i = start_hr; i != end_hr; i++) {
@@ -330,39 +331,22 @@ void Test_All(void){
 
 /* Test the Wrap_hours function */
 void Test_Wrap_Hours(void) {
-    int hour1 = 22,
-        hour2 = 4,
-        hour3 = 25,
-        expected_hour1 = 22,
-        expected_hour2 = 4,
-        expected_hour3 = 1;
-    
-    assert(expected_hour1 == Wrap_Hour(hour1));
-    assert(expected_hour2 == Wrap_Hour(hour2));
-    assert(expected_hour3 == Wrap_Hour(hour3));
+    int hour[3] = {22, 4, 25},
+        expected_hour[3] = {22, 4, 1};
+
+    assert(expected_hour[0] == Wrap_Hour(hour[0]));
+    assert(expected_hour[1] == Wrap_Hour(hour[1]));
+    assert(expected_hour[2] == Wrap_Hour(hour[2]));
 }
 
 /* Test the Day_To_Weekday function */
 void Test_Day_To_Weekday(void) {
-    int day1 = 30,
-        day2 = 600,
-        day3 = 45,
-        expected_day1 = 4,
-        expected_day2 = 0,
-        expected_day3 = 5;
+    int day[5] = {30, 365, 45, 60, 61},
+        expected_day[5] = {6, 5, 0, 1, 2};
 
-    assert(expected_day1 == Day_To_Weekday(day1));
-    assert(expected_day2 == Day_To_Weekday(day2));
-    assert(expected_day3 == Day_To_Weekday(day3));
-}
-
-/* Test the Fixed_Percent function */
-void Test_Fixed_Percent(void) {
-    double   min[5] = {11, 55, 33},
-             max[5] = {65, 120, 85};
-    int expected[5] = {83, 54, 61};
-
-    assert(expected[0] == (int)Fixed_Percent(max[0], min[0]));
-    assert(expected[1] == (int)Fixed_Percent(max[1], min[1]));
-    assert(expected[2] == (int)Fixed_Percent(max[2], min[2]));
+    assert(expected_day[0] == Day_To_Weekday(day[0]));
+    assert(expected_day[1] == Day_To_Weekday(day[1]));
+    assert(expected_day[2] == Day_To_Weekday(day[2]));
+    assert(expected_day[3] == Day_To_Weekday(day[3]));
+    assert(expected_day[4] == Day_To_Weekday(day[4]));
 }

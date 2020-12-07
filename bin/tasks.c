@@ -3,7 +3,7 @@
 /** Print a list of all non-empty tasks in the task array.
  *  @param task_list[i] Active array of task structures.
  *  @param task_amount[i] Amount of non-empty task structures in the array. */
-void Print_Task_List (task *task_list, int task_amount, int price_day) {
+void Print_Task_List (task *task_list, int task_amount, int current_day) {
     int i;
     if (task_amount == 0) {
         printf("There are currently no tasks. Enter 'add' to begin adding some.\n"); 
@@ -23,7 +23,7 @@ void Print_Task_List (task *task_list, int task_amount, int price_day) {
                     task_list[i].duration, 
                     task_list[i].kWh,
                     task_list[i].is_passive == 1 ? 'P' : 'A',
-                    task_list[i].days[price_day] ? 'Y' : 'N');
+                    task_list[i].days[current_day] ? 'Y' : 'N');
         }
     }
     Print_Line(0, "");
@@ -107,8 +107,8 @@ void Reset_Task (task *p_task) {
     p_task->kWh = 0.0;
     p_task->start_hr = 0;
     p_task->end_hr = 0;
-    p_task->max_price = 0;
-    p_task->min_price = 0;
+    p_task->max_value = 0;
+    p_task->min_value = 0;
     p_task->total_days_yr = 0;
 }
 
@@ -177,6 +177,7 @@ void Set_Task_Duration (double *duration) {
 void Set_Task_Status (int *is_passive) {
     char temp_string[TASK_NAME_MAX],
          bool_input;
+        
     printf("Is the task passive? (y/n): ");
     fgets(temp_string, TASK_NAME_MAX, stdin);
     sscanf(temp_string, " %c", &bool_input);
@@ -324,21 +325,25 @@ void Edit_Task (task *task_list, int task_amount, int task_id) {
  *  @param task_amount[i] Amount of non-empty task structures in the task array.
  *  @param task_list[i] Active array of task structures.
  *  @param time[i] Struct containing info on the current date/time. **/
-void Print_Suggestions_Day (int task_amount, task task_list[TASK_AMOUNT_MAX], int price_day) {
+void Print_Suggestions_Day (int task_amount, task task_list[TASK_AMOUNT_MAX], int current_day, int use_emissions) {
     int i;
+
     Print_Line(1, "Task Suggestions");
-    printf("%-20s %-12s %-10s %-14s %-14s %-8s\n", "Task", "Status", "Hours", "Min price", "Max price", "Savings");
+    printf("%-20s %-12s %-10s %-14s %-14s %-8s\n", "Task", "Status", "Hours", "Min value", "Max value", "Savings");
     for (i = 0; i < task_amount; i++) {
-        if (!task_list[i].min_price || !task_list[i].days[price_day])
+        if (!task_list[i].days[current_day] || !task_list[i].min_value)
             continue;
-        printf("%-20s %3c %11.2d-%-2.2d %11.2f %14.2f %14.1f%%\n",
+
+        printf("%-20s %3c %11.2d-%-2.2d %14.2f %s %10.2f %s %7.1f%%\n",
             task_list[i].name,
             task_list[i].is_passive ? 'P' : 'A',
             task_list[i].start_hr,
             task_list[i].end_hr,
-            task_list[i].min_price,
-            task_list[i].max_price,
-            Fixed_Percent(task_list[i].max_price, task_list[i].min_price));
+            task_list[i].min_value,
+            use_emissions ? "g  " : "DKK",
+            task_list[i].max_value,
+            use_emissions ? "g  " : "DKK",
+            Fixed_Percent(task_list[i].max_value, task_list[i].min_value));
     }
     Print_Line(0, "");
 }
@@ -346,17 +351,29 @@ void Print_Suggestions_Day (int task_amount, task task_list[TASK_AMOUNT_MAX], in
 /** Prints the suggested starting times and potential savings for all tasks.
  *  @param task_amount[i] Amount of non-empty task structures in the task array.
  *  @param task_list[i] Active array of task structures. */
-void Print_Suggestions_Year (int task_amount, task task_list[TASK_AMOUNT_MAX]) {
+void Print_Suggestions_Year (int task_amount, task task_list[TASK_AMOUNT_MAX], int use_emissions) {
     int i;
+    double min_value, max_value;
+    
     Print_Line(1, "Potential yearly savings");
-    printf("%-20s %-9s %17s %16s %16s\n", "Task", "Days/year", "Min price", "Max price", "Savings");
+    printf("%-20s %-9s %17s %18s %14s\n", "Task", "Days/year", "Min value", "Max value", "Savings");
     for (i = 0; i < task_amount; i++) {
-        printf("%-20s %6d %20.2f %16.2f %15.1f%%\n",
+        min_value = task_list[i].min_value;
+        max_value = task_list[i].max_value;
+
+        if (use_emissions) {
+            min_value /= G_PER_KG;
+            max_value /= G_PER_KG;
+        }
+
+        printf("%-20s %6d %20.2f %s %14.2f %s %9.1f%%\n",
             task_list[i].name,
             task_list[i].total_days_yr,
-            task_list[i].min_price,
-            task_list[i].max_price,
-            Fixed_Percent(task_list[i].max_price, task_list[i].min_price));
+            min_value,
+            use_emissions ? "kg " : "DKK",
+            max_value,
+            use_emissions ? "kg " : "DKK",
+            Fixed_Percent(task_list[i].max_value, task_list[i].min_value));
     }
     Print_Line(0, "");
 }
@@ -390,4 +407,15 @@ void Test_KW(void) {
     assert(expected1 == Calculate_kWh(actual1));
     assert(expected2 == Calculate_kWh(actual2));
     assert(expected3 == Calculate_kWh(actual3));
+}
+
+/* Test the Fixed_Percent function */
+void Test_Fixed_Percent(void) {
+    double   min[5] = {11, 55, 33},
+             max[5] = {65, 120, 85};
+    int expected[5] = {83, 54, 61};
+
+    assert(expected[0] == (int)Fixed_Percent(max[0], min[0]));
+    assert(expected[1] == (int)Fixed_Percent(max[1], min[1]));
+    assert(expected[2] == (int)Fixed_Percent(max[2], min[2]));
 }
