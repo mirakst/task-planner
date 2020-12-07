@@ -98,13 +98,15 @@ void Print_User (User user) {
     printf("Ignore available hours: %s\n", user.ignore_availability ? "Yes" : "No");
     printf("Using data: %s\n\n", user.use_emissions == 1 ? "Emissions" : "Prices");
     Print_Line(1, "Availability");
-
+    
+    printf("     ");
     for (i = 0; i < HOURS_PER_DAY; i++)
         printf("%2.2d ", i);
     
     printf("\n");
     Print_Line(0, "");
-
+    
+    printf("     ");
     for (i = 0; i < HOURS_PER_DAY; i++)
         printf("%2c ", user.available_hours[i] ? 'Y' : 'n');
 
