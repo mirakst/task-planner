@@ -336,7 +336,7 @@ void Test_Wrap_Hours(void) {
 
 /* Test the Day_To_Weekday function */
 void Test_Day_To_Weekday(void) {
-    int day[5] = {30, 365, 45, 60, 61},
+    int day[5] = {29, 364, 44, 59, 60},
         expected_day[5] = {6, 5, 0, 1, 2};
 
     assert(expected_day[0] == Day_To_Weekday(day[0]));
