@@ -128,4 +128,8 @@ int Wrap_Hour (int hour) {
  *  @return Returns the input day as a weekday (0-6). */
 int Day_To_Weekday (int day) {
     return ((FIRST_WEEKDAY_OF_YEAR + day) % DAYS_PER_WEEK);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4e461dcb8d69e168af06670d8b13ee40a580ea76
