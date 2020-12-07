@@ -13,6 +13,7 @@
 #include "bin/user_details.h"
 #include "bin/graphics.h"
 #include "bin/help.h"
+#include "bin/get_input.h"
 
 #define FUCKING_BIG_ASS_NUMBER 10000.0
 #define INPUT_MAX 30
@@ -126,5 +127,5 @@ int Wrap_Hour (int hour) {
  *  @param day[i] Day to be converted.
  *  @return Returns the input day as a weekday (0-6). */
 int Day_To_Weekday (int day) {
-    return (FIRST_WEEKDAY_OF_YEAR + ((day - 1) % DAYS_PER_WEEK)) % DAYS_PER_WEEK;
+    return ((FIRST_WEEKDAY_OF_YEAR + day) % DAYS_PER_WEEK);
 }

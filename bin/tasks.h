@@ -8,13 +8,17 @@
 
 #define FILE_TASKLIST           "config/tasklist.cfg"
 #define EMPTY_TASK_NAME         "none"
-#define TASK_AMOUNT_MAX         20
-#define TASK_NAME_ALLOC         100
-#define TASK_NAME_MAX           21
-#define MIN_PER_HOUR            60
-#define W_PER_KW                1000
-#define G_PER_KG                1000
-#define READ_LINE_MAX           100
+#define TASK_AMOUNT_MAX          20
+#define TASK_NAME_ALLOC          100
+#define TASK_NAME_MAX            21
+#define TASK_DURATION_MAX        1440
+#define TASK_POWER_MAX           50000
+#define MIN_PER_HOUR             60
+#define W_PER_KW                 1000
+#define G_PER_KG                 1000
+#define READ_LINE_MAX            100
+
+typedef enum task_type {active, passive, timed} task_type;
 
 /** The task structure.
  *  Contains all information needed for a task.
@@ -29,7 +33,7 @@
  *  @param min_value Double for the minimum value of completing the task.
  *  @param max_value Double for the maximum value of completing the task. */
 typedef struct task {
-    int is_passive;
+    int type;
     char name[TASK_NAME_MAX];
     double power,
            kWh,
@@ -66,6 +70,9 @@ void Print_Task_List(task *, int, int);
 void Print_Suggestions_Day (int, task[TASK_AMOUNT_MAX], int, int);
 void Print_Suggestions_Year (int, task[TASK_AMOUNT_MAX], int);
 double Fixed_Percent(double, double);
+
+int Get_Bool_Input(void);
+double Get_Double_Input(int);
 
 /* Testing */
 void Test_KW(void);

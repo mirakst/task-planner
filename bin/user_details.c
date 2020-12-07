@@ -6,12 +6,22 @@
 #include "graphics.h"
 #include "help.h"
 
+void Reset_User (User *user) {
+    int i;
+    strcpy(user->user_name, "Undefined");
+    user->ignore_availability = 0;
+    user->use_emissions = 0;
+    for (i = 0; i < HOURS_PER_DAY; i++)
+        user->available_hours[i] = 0;
+}
+
 /** Performs a setup if there is no settings file.
  * @param[o] The active user struct. */
 void First_Time_Setup (User *user) {
-    Print_Line(1, "Starting first setup");
+    Print_Line(1, "First time setup");
     Get_Name(user);
     Set_Available_Hours(user);
+    Set_Ignore_Hours(user);
     Set_Data_Type(user);
     Print_Line(0, "");
 }
@@ -23,9 +33,8 @@ void Get_Name (User *user) {
 
     printf("Please enter your name: ");
     fgets(temp_string, USERNAME_MAX, stdin);
-    sscanf(temp_string, "%[^\n]", user->user_name);
+    sscanf(temp_string, " %[^\n]", user->user_name);
     printf("Hello %s\n", user->user_name);
-    user->has_name = 1;
 }
 
 /** Reset the available hours.
@@ -35,8 +44,6 @@ void Reset_Available_Hours (int time[HOURS_PER_DAY]) {
     
     for (i = 0; i < HOURS_PER_DAY; i++)
         time[i] = 0;
-
-    printf("The available hours were succesfully reset.\n");
 }
 
 /** Adds available hours to the available hours int array
@@ -48,17 +55,13 @@ void Set_Available_Hours (User *user) {
 
     printf("Enter your available hours (0-23): ");
     fgets(temp_string, 10, stdin);
-    sscanf(temp_string, " %d %d", &start_time, &end_time);
-
-    if ((start_time > HOURS_PER_DAY || start_time < 0) || (end_time > HOURS_PER_DAY || end_time < 0)) {
-        printf("Please enter only valid hours (1-24). Cancelling...\n");
-        return;
+    while (sscanf(temp_string, " %d %d", &start_time, &end_time) != 2) {
+        printf("Please use correct formatting: HOUR HOUR\n");
+        fgets(temp_string, 10, stdin);
     }
-
-    /* For loop setting every hour to 0 on first run */
-    if (!user->has_set_hours) {
-        for (i = 0; i < HOURS_PER_DAY; i++)
-            user->available_hours[i] = 0;
+    if ((start_time > HOURS_PER_DAY || start_time < 0) || (end_time > HOURS_PER_DAY || end_time < 0)) {
+        printf("Please enter only valid hours (0-23). Cancelling...\n");
+        return;
     }
 
     /* For loop setting the boolean array for the hours */
@@ -83,7 +86,6 @@ void Set_Available_Hours (User *user) {
         }
         
     }
-    user->has_set_hours = 1;
 }
 
 /** Prints the input user details
@@ -94,7 +96,7 @@ void Print_User (User user) {
     Print_Line(1, "User");
     printf("Username: %s\n", user.user_name);
     printf("Ignore available hours: %s\n", user.ignore_availability ? "Yes" : "No");
-    printf("Using data: %s\n\n", user.xXxcumShotxXx == 1 ? "Emissions" : "Prices");
+    printf("Using data: %s\n\n", user.use_emissions == 1 ? "Emissions" : "Prices");
     Print_Line(1, "Availability");
 
     for (i = 0; i < HOURS_PER_DAY; i++)
@@ -130,7 +132,7 @@ int Load_User_Details (User *user) {
         else if (i == 1)
             sscanf(temp_string, " %*[^:] %*c %d\n", &user->ignore_availability);
         else if (i == 2)
-            sscanf(temp_string, " %*[^:] %*c %d\n", &user->xXxcumShotxXx);
+            sscanf(temp_string, " %*[^:] %*c %d\n", &user->use_emissions);
         else
             sscanf(temp_string, " %*d %*c %d\n", &user->available_hours[i - 3]);
     }
@@ -146,16 +148,13 @@ int Save_User_Details (User user) {
     int i = 0;
     FILE *p_File;
 
-    if (user.has_set_hours != 1 && user.has_name != 1)
-        return 0;
-
     p_File = fopen(FILE_USER_DETAILS, "w");
     if(p_File == NULL)
         return -1;
     
     fprintf(p_File, "Username: %s\n", user.user_name);
     fprintf(p_File, "Ignore hours: %d\n", user.ignore_availability);
-    fprintf(p_File, "Use emissions: %d\n", user.xXxcumShotxXx);
+    fprintf(p_File, "Use emissions: %d\n", user.use_emissions);
     
     for (i = 0; i < HOURS_PER_DAY; i++)
         fprintf(p_File, "%d-%d\n", i, user.available_hours[i]);
@@ -167,35 +166,15 @@ int Save_User_Details (User user) {
 /** Sets ignore_hours in the user struct according to the given input
  * @param user[o] the active user struct  */
 void Set_Ignore_Hours(User *user) {
-    char temp[5],
-         bool_input;
-
     printf("Suggest tasks outside your available hours? (y/n): ");
-    fgets(temp, 5, stdin);
-    sscanf(temp, " %c", &bool_input);
-        
-    if (tolower(bool_input) == 'y')
-        user->ignore_availability = 1;
-    else
-        user->ignore_availability = 0;
-    printf("Settings have been saved succesfully.\n");
+    user->ignore_availability = Get_Bool_Input();
 }
 
 /** Sets use_emissions in the user struct according to the given input
  * @param user[o] the active user struct  */
 void Set_Data_Type(User *user) {
-    char temp[5],
-         bool_input;
-
     printf("Suggest tasks based on CO2 emissions? (y/n): ");
-    fgets(temp, 5, stdin);
-    sscanf(temp, " %c", &bool_input);
-        
-    if (tolower(bool_input) == 'y')
-        user->xXxcumShotxXx = 1;
-    else
-        user->xXxcumShotxXx = 0;
-    printf("Settings have been saved succesfully.\n");
+    user->use_emissions = Get_Bool_Input();
 }
 
 
@@ -213,16 +192,13 @@ void Print_Settings(User *user) {
            "4: Reset available hours\n"
            "5: Set ignore hours\n"
            "6: Set data type\n"
-           "7: Save user details\n"
-           "8: More info\n"
+           "7: More info\n"
            "0: Go back\n");
     Print_Line(0, "");
     
-    do {
-        printf("Choose a setting: ");
-        fgets(temp_string, 5, stdin);
-        sscanf(temp_string, " %d", &input);
-
+    printf("Choose a setting: ");
+    fgets(temp_string, 5, stdin);
+    if (sscanf(temp_string, " %d", &input) == 1) {
         switch (input) {
         case 0:
             Save_User_Details(*user);
@@ -239,6 +215,7 @@ void Print_Settings(User *user) {
             break;
         case 4:
             Reset_Available_Hours(user->available_hours);
+            printf("The available hours were succesfully reset.\n");
             break;
         case 5:
             Set_Ignore_Hours(user);
@@ -247,15 +224,13 @@ void Print_Settings(User *user) {
             Set_Data_Type(user);
             break;
         case 7:
-            Save_User_Details(*user);
-            printf("Settings have been saved succesfully.\n");
-            break;
-        case 8:
             Help_Settings_Extended();
             break;
         default:
             printf("The command was not recognized.\n"); 
             break;
         }
-    } while (input);
+    }
+    else
+        printf("Setting not recognized");
 }
