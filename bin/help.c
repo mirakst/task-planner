@@ -106,8 +106,9 @@ void Help_Tasks_Extended(void) {
            "2: Change the power usage of the task\n"
            "3: Change the duration of the task\n"
            "4: Change the status of the task.\n"
-           "Active: The user must be present during the entire task duration.\n"
+           "Active : The user must be present during the entire task duration.\n"
            "Passive: The user must only be present to start the task.\n"
+           "Timed  : The appliance can scheduled to start automatically at a given hour.\n"
            "5: Set the days when this task should be done.\n");
     Print_Line(FALSE, "");
 }
