@@ -249,7 +249,6 @@ void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY]
                     cur_value += p_task->power * (p_task->duration - j) * data[i + j][0];
                 else
                     cur_value += p_task->power * data[i + j][0];
-                printf("Current hours price[%d]: %.3f\n", i + j, data[i + j][0]);
             }
 
             value_avg = cur_value / duration;
