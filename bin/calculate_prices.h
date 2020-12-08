@@ -4,7 +4,7 @@
 #define EMISSIONS_FILE "config/emissions_2019.csv"
 
 int Double_Compare (const void *, const void *);
-int Load_kWh_Data (double[][2], int, int);
-int Calculate_kWh_Data (double[][2], int, int);
-void List_kWh_Data (double[][2], int);
-void Change_Day (double[][2], int *, int);
+int Load_kWh_Data (double[], int, int);
+int Calculate_kWh_Data (double[], int, int);
+void List_kWh_Data (double[], int);
+void Change_Day (double[], int *, int);

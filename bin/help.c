@@ -93,8 +93,7 @@ void Help_Settings_Extended(void) {
            "3: Insert another interval into your available hours\n"
            "4: Reset all hours so every hour is unavailable\n"
            "5: Set whether to suggest tasks outside of the available hours\n"
-           "6: Set whether suggestions should be based on prices or emissions\n"
-           "7: Show this list\n");
+           "6: Set whether suggestions should be based on prices or emissions\n");
     Print_Line(FALSE, "");
 }
 

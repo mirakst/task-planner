@@ -10,7 +10,7 @@
 int main(void) {
     User user;
     char cmd_input[INPUT_MAX];
-    double active_data[HOURS_PER_DAY * 2][2] = {0};
+    double active_data[HOURS_PER_DAY * 2] = {0};
     task task_list[TASK_AMOUNT_MAX];
     int task_amount = 0,
         task_id = 0,
@@ -80,12 +80,12 @@ int main(void) {
 }
 
 /** Performs all necessary initialization and loading of structs and variables.
- *  @param data[i] 2D array of doubles containing the price or emission for each hour in a day (1-24).
+ *  @param data[i] Array of doubles containing the price or emission for each hour in a day (1-24).
  *  @param user[i/o] User structure with all user details.
  *  @param task_list[i/o] Active array of tasks. 
  *  @param task_amount[i/o] Amount of non-empty tasks in the task array. 
  *  @param current_day[i/o] Pointer to the current day (0-365) */
-void Initialize(double data[][2], User *user, task task_list[TASK_AMOUNT_MAX], int *task_amount, int *current_day) {
+void Initialize(double data[], User *user, task task_list[TASK_AMOUNT_MAX], int *task_amount, int *current_day) {
     time_t t = time(NULL);
     struct tm time = *localtime(&t);
     int i;
@@ -120,7 +120,7 @@ void Initialize(double data[][2], User *user, task task_list[TASK_AMOUNT_MAX], i
         printf("Tasks today:\n");
         for (i = 0; i < *task_amount; i++) {
             if (task_list[i].days[Day_To_Weekday(*current_day)])
-                printf("%s, ", task_list[i].name);
+                printf("(%d) %s\n", i, task_list[i].name);
         }
         printf("\n");
     }
@@ -148,9 +148,9 @@ void Save(User user, task task_list[TASK_AMOUNT_MAX], int task_amount) {
  *  @param user[i] User structure with all user details.
  *  @param task_list[][i] Array of task structures.
  *  @param task_amount[i] Amount of task structures in the task array.
- *  @param data[i/o] 2D array of doubles containing the price or emission for each hour in a day (1-24).
+ *  @param data[i/o] Array of doubles containing the price or emission for each hour in a day (1-24).
  *  @param current_day[i] The day that prices are loaded from. Can be edited for debugging. */
-void Suggest_Day (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, double data[][2], int current_day) {
+void Suggest_Day (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, double data[], int current_day) {
     int *assigned_hours = calloc(HOURS_PER_DAY, sizeof(int));
     int i;
 
@@ -173,9 +173,9 @@ void Suggest_Day (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, d
  *  @param user[i] User structure with all user details.
  *  @param task_list[][i] Array of task structures.
  *  @param task_amount[i] Amount of task structures in the task array.
- *  @param data[i/o] 2D array of doubles containing the price or emission for each hour in a day (1-24).
+ *  @param data[i/o] Array of doubles containing the price or emission for each hour in a day (1-24).
  *  @param current_day[i] The day that prices are loaded from. Can be edited for debugging. */
-void Suggest_Year (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, double data[][2], int current_day) {
+void Suggest_Year (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, double data[], int current_day) {
     int *assigned_hours = calloc(HOURS_PER_DAY, sizeof(int));
     int i, day;
 
@@ -209,10 +209,10 @@ void Suggest_Year (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, 
  *  @param user[i] User structure with all user details.
  *  @param p_task[i/o] Pointer to a task structure.
  *  @param assigned_hours[][i] Sees if there is an active task on the hour.
- *  @param data[i/o] 2D array of doubles containing the price or emission for each hour in a day (1-24).
+ *  @param data[i/o] Array of doubles containing the price or emission for each hour in a day (1-24).
  *  @param day[i] The day that prices are loaded from. Can be edited for debugging.
  *  @param do_year[i] Boolean to determine whether the yearly or daily savings should be calculated (true = 1, false = 0). */
-void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY], double data[][2], int day, int do_year) {
+void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY], double data[], int day, int do_year) {
     int i, j,
         duration,
         end_hr = 0,
@@ -246,9 +246,9 @@ void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY]
                 /* Handle 'overflowing' hours 
                  Eks. duration = 3, p_task->duration = 2.5, så skal den sidste times pris ganges med den resterende længde af tasken (0.5 timer) */
                 if (p_task->duration > j && p_task->duration < (j + 1)) 
-                    cur_value += p_task->power * (p_task->duration - j) * data[i + j][0];
+                    cur_value += p_task->power * (p_task->duration - j) * data[i + j];
                 else
-                    cur_value += p_task->power * data[i + j][0];
+                    cur_value += p_task->power * data[i + j];
             }
 
             value_avg = cur_value / duration;

@@ -2,7 +2,8 @@
 #define I_H
 
 #define TASK_NAME_MAX 21
-
+/** Takes bool input from user in format (y/n).
+ *  @return 1 if input is y, 0 otherwise */
 int Get_Bool_Input(void) {
     char temp_string[TASK_NAME_MAX],
         bool_input;
@@ -18,6 +19,9 @@ int Get_Bool_Input(void) {
     return bool_input == 'y' ? 1 : 0;
 }
 
+/** Takes double input from user.
+ *  @param maxinput[i] The maximum input.
+ *  @return the double value from user. */
 double Get_Double_Input(int maxinput) {
     char temp_string[TASK_NAME_MAX];
     double res;
