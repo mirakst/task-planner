@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include "graphics.h"
 
+#define TRUE 1
+#define FALSE 0
+
 /* Help functions called by commands */
 void Print_Welcome (void);
 void Help_All(void);

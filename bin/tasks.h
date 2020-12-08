@@ -22,7 +22,7 @@ typedef enum task_type {active, passive, timed} task_type;
 
 /** The task structure.
  *  Contains all information needed for a task.
- *  @param is_passive Boolean that determines if the task is passive (1 = true, 0 = false).
+ *  @param type Enum that determines if the task is Active, Passive or Timed. (0, 1 & 2).
  *  @param name String that contains the name of the task.
  *  @param power Double that contains the power of the task. 
  *  @param kWh Double that contains the power consumption of the task.
@@ -30,6 +30,7 @@ typedef enum task_type {active, passive, timed} task_type;
  *  @param start_hr Int for the start time of the task.
  *  @param end_hr Int for the end time of the task.
  *  @param days[] An array of the days in a week (there are 7).
+ *  @param total_days_yr Int for calculating the amount of days task is performed throughout the year.
  *  @param min_value Double for the minimum value of completing the task.
  *  @param max_value Double for the maximum value of completing the task. */
 typedef struct task {
@@ -39,7 +40,6 @@ typedef struct task {
            kWh,
            duration;
     
-    /* Assignment */
     int start_hr,
         end_hr,
         days[7],

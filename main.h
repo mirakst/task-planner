@@ -27,7 +27,8 @@
 #define LIST_TASKS            "task list\n"
 #define HELP                  "help\n"
 #define HELP_TASKS            "help task\n"
-#define HELP_PRICES           "help prices\n"
+#define HELP_TASK_EDIT        "help task edit\n"
+#define HELP_DATA             "help data\n"
 #define HELP_SETTINGS         "help settings\n"
 #define ADD_TASK              "task add\n"
 #define REMOVE_TASK           "task remove"
@@ -39,7 +40,7 @@
 #define SAVE_USER             "save\n"
 
 typedef enum Commands {_exit, unrecognized,
-                       help, help_tasks, help_prices, help_settings,
+                       help, help_tasks, help_data, help_settings, help_task_edit,
                        settings, change_day, save_user,
                        list_data, list_data_sorted,
                        list_tasks, add_task, remove_task, edit_task,
@@ -76,12 +77,14 @@ int Get_Command_From_String(char *str) {
         return _exit;
     else if (!strcmp(str, HELP))
         return help;
-    else if (!strcmp(str, HELP_PRICES))
-        return help_prices;
+    else if (!strcmp(str, HELP_DATA))
+        return help_data;
     else if (!strcmp(str, HELP_TASKS))
         return help_tasks;
     else if (!strcmp(str, HELP_SETTINGS))
         return help_settings;
+    else if (!strcmp(str, HELP_TASK_EDIT))
+        return help_task_edit;
     else if (!strcmp(str, SETTINGS))
         return settings;
     else if (!strcmp(str, SAVE_USER))
@@ -107,7 +110,7 @@ int Get_Command_From_String(char *str) {
 }
 
 /** Gets input from the user. 
- *  @param input[o] String containing the user command.
+ *  @param input[i/o] String containing the user command.
  *  @return The command index in the command enum. */
 int Get_User_Input (char *input) {
     printf("\nPlease enter a command: ");
@@ -117,7 +120,7 @@ int Get_User_Input (char *input) {
 }
 
 /** Wraps the input hour if it surpasses the amount of hours in a day.
- *  @param hour[i] Amount of hours to be wrapped.
+ *  @param hour[i/o] Amount of hours to be wrapped.
  *  @return Returns the input hour in the range 0-23. */
 int Wrap_Hour (int hour) {
     return (hour >= HOURS_PER_DAY) ? (hour - HOURS_PER_DAY) : hour;
