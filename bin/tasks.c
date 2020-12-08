@@ -86,7 +86,7 @@ int Save_Tasks (task *task_list, int task_amount, char *file_location) {
 
     Sort_Task_List(task_list);
     for (i = 0; i < task_amount; i++) {
-        fprintf(fp, "name: %s, power: %f, duration: %.1f, type: %d, days: %d %d %d %d %d %d %d\n",
+        fprintf(fp, "name: %s, power: %f, duration: %f, type: %d, days: %d %d %d %d %d %d %d\n",
                 task_list[i].name, task_list[i].power, task_list[i].duration, task_list[i].type,
                 task_list[i].days[0], task_list[i].days[1], task_list[i].days[2], 
                 task_list[i].days[3], task_list[i].days[4], task_list[i].days[5], 
