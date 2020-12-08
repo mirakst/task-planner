@@ -2,8 +2,9 @@
 #include "help.h"
 
 /** Print a list of all non-empty tasks in the task array.
- *  @param task_list[i] Active array of task structures.
- *  @param task_amount[i] Amount of non-empty task structures in the array. */
+ *  @param task_list[i/o] Active array of task structures.
+ *  @param task_amount[i] Amount of non-empty task structures in the array. 
+ *  @param current_day[i] The day the program is currently loading data from */
 void Print_Task_List (task *task_list, int task_amount, int current_day) {
     int i;
     char type[3] = {'A', 'P', 'T'};
@@ -36,6 +37,7 @@ void Print_Task_List (task *task_list, int task_amount, int current_day) {
 /** Load tasks from the config file.
  *  @param task_list[i/o] Active array of task structures.
  *  @param task_amount[i/o] Amount of non-empty task structures in the array. 
+ *  @param file_location[i] Location of the file where tasks are stored locally. 
  *  @return -1 if the file was not found, 0 if nothing was loaded, and 1 otherwise. */
 int Load_Tasks (task *task_list, int *task_amount, char *file_location) {
     char temp_string[READ_LINE_MAX];
@@ -69,7 +71,8 @@ int Load_Tasks (task *task_list, int *task_amount, char *file_location) {
 
 /** Save all tasks from the task array to the config file.
  *  @param task_list[i] Active array of task structures.
- *  @param task_amount[i]  Amount of non-empty tasks in the array. 
+ *  @param task_amount[i]  Amount of non-empty tasks in the array.
+ *  @param file_location[i] Location of the file where tasks are stored locally.
  *  @return -1 if the file could not be saved, and 1 otherwise. */
 int Save_Tasks (task *task_list, int task_amount, char *file_location) {
     int i;
@@ -140,8 +143,8 @@ void Add_Task (task *task_list, int *task_amount) {
     Sort_Task_List(task_list);
 }
 
-/** Changes the name of a task.
- *  @param name[i] String that contains the name of the task. */
+/** Sets or changes the name of a task.
+ *  @param name[o] String that contains the name of the task. */
 void Set_Task_Name (char *name) {
     do {
         printf("Task name (max %d): ", TASK_NAME_MAX - 1);
@@ -151,30 +154,30 @@ void Set_Task_Name (char *name) {
     } while (!strcmp(name, EMPTY_TASK_NAME));
 }
 
-/** Changes the power of a task.
- *  @param power[i] Power usage of the task (in Watts). */
+/** Sets or changes the power of a task.
+ *  @param power[o] Power usage of the task (in Watts). */
 void Set_Task_Power (double *power) {
     printf("Power usage (watts): ");
     *power = Get_Double_Input (TASK_POWER_MAX);
     *power /= W_PER_KW;
 }
 
-/** Changes the duration of a task.
- *  @param duration[i] Duration of the task (in hours). */
+/** Sets or changes the duration of a task.
+ *  @param duration[o] Duration of the task (in hours). */
 void Set_Task_Duration (double *duration) {
     printf("Task duration (minutes): ");
     *duration = Get_Double_Input (TASK_DURATION_MAX);
     *duration /= MIN_PER_HOUR;
 }
 
-/** Changes the status of a task.
- *  @param type[i] enum value that represents task type (0 = active, 1 = Passive, 2 = Timed). */
+/** Sets or changes the status of a task.
+ *  @param type[o] enum value that represents task type (0 = active, 1 = Passive, 2 = Timed). */
 void Set_Task_Status (int *type) {
     printf("Choose the task type (1 = Active, 2 = Passive, 3 = Timed): ");
     *type = (int)Get_Double_Input(3) - 1;
 }
 
-/** Changes the weekdays that a task is done.
+/** Sets or changes the weekdays that a task is done.
  *  @param days[o] Array of booleans that decide whether a task is done on a certain weekday (true = 1, false = 0). */
 void Set_Task_Days (int days[7]) {
     char *weekdays[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
@@ -191,7 +194,8 @@ void Set_Task_Days (int days[7]) {
  *  The selected task is effectively reset, since it cannot actually be removed from a static array in C.
  *  @param task_list[i] Active array of task structures.
  *  @param task_amount[i] Pointer to the amount of non-empty task structures in the array.
- *  @param id[i] The id/index of the task to be removed. */
+ *  @param id[i] The id/index of the task to be removed. 
+ *  @return right away if the ID input does not refer to a task. */
 void Remove_Task (task *task_list, int *task_amount, int id) {
     char task_name[TASK_NAME_ALLOC];
     id--;
@@ -306,7 +310,8 @@ void Edit_Task (task *task_list, int task_amount, int task_id) {
 /** Prints the suggested starting times and potential savings for all tasks.
  *  @param task_amount[i] Amount of non-empty task structures in the task array.
  *  @param task_list[i] Active array of task structures.
- *  @param time[i] Struct containing info on the current date/time. **/
+ *  @param current_day[i] The day the program is currently loading data from 
+ *  @param use_emissions[i] Bool informing the function wether it's printing CO2 emissions or prices **/
 void Print_Suggestions_Day (int task_amount, task task_list[TASK_AMOUNT_MAX], int current_day, int use_emissions) {
     int i;
     char type[3] = {'A', 'P', 'T'};
@@ -331,9 +336,10 @@ void Print_Suggestions_Day (int task_amount, task task_list[TASK_AMOUNT_MAX], in
     Print_Line(0, "");
 }
 
-/** Prints the suggested starting times and potential savings for all tasks.
+/** Prints the potential savings across a year for all tasks.
  *  @param task_amount[i] Amount of non-empty task structures in the task array.
- *  @param task_list[i] Active array of task structures. */
+ *  @param task_list[i] Active array of task structures. 
+ *  @param use_emissions[i] Bool informing the function wether it's printing CO2 emissions or prices */
 void Print_Suggestions_Year (int task_amount, task task_list[TASK_AMOUNT_MAX], int use_emissions) {
     int i;
     double min_value, max_value;
@@ -362,9 +368,9 @@ void Print_Suggestions_Year (int task_amount, task task_list[TASK_AMOUNT_MAX], i
 }
 
 /** Calculates the difference between two numbers in fixed percent.
- *  @param min[i] Lowest input.
  *  @param max[i] Highest input.
- *  @return Returns the difference between min and max in fixed percent. */
+ *  @param min[i] Lowest input.
+ *  @return Returns the difference between max and min in fixed percent. */
 double Fixed_Percent(double max, double min) {
     return (min != 0) ? (-((min / max) - 1) * 100.0) : 0;
 }

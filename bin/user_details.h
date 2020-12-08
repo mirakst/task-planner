@@ -7,9 +7,8 @@
  * Contains all user settings.
  * @param available_hours[] Array of ints that keep track of user availability for all hours of a day (1 = available, 0 = unavailable).
  * @param user_name String with the name of the user.
- * @param has_name Boolean that determines if a user name has been set (1 = true, 0 = false).
- * @param has_set_hours Boolean that determines if available hours has been set (1 = true, 0 = false).
- * @param ignore_hours Boolean that determines whether the available hours should be ignored when running the Find_Lowest_Prices() function. */
+ * @param ignore_availability Boolean that determines whether the available hours should be ignored when running the Find_Start_Hour() function.
+ * @param use_emissions Boolean that determines which data to use in Find_Start_Hour() (0 = prices, 1 = emissions). */
 typedef struct User_Details {
     int available_hours[HOURS_PER_DAY];
     char user_name [USERNAME_MAX];
@@ -27,6 +26,6 @@ void Set_Available_Hours (User *);
 void Print_User (User);
 int Load_User_Details (User *);
 int Save_User_Details (User);
-void Set_Ignore_Hours (User *);
+void Set_Ignore_Availability (User *);
 void Set_Data_Type(User *);
 void Print_Settings (User *);

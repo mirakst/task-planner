@@ -4,12 +4,13 @@
  * Gruppe: A405a
  * Studieretning: Software 
  */
+
 #include "main.h"
 
 int main(void) {
     User user;
     char cmd_input[INPUT_MAX];
-    double active_data[HOURS_PER_DAY + 6][2];
+    double active_data[HOURS_PER_DAY * 2][2] = {0};
     task task_list[TASK_AMOUNT_MAX];
     int task_amount = 0,
         task_id = 0,
@@ -27,15 +28,17 @@ int main(void) {
             printf("Exiting...\n"); break;
         case help:
             Help_All(); break;
-        case help_prices:
+        case help_data:
             Help_Data(1); break;
         case help_tasks:
             Help_Tasks(1); break;
         case help_settings:
             Help_Settings(1); break;
+        case help_task_edit:
+            Help_Tasks_Extended(); break;
         case settings:
             Print_Settings(&user);
-            Calculate_kWh_Data(active_data, 0, current_day, user.use_emissions); break;
+            Load_kWh_Data(active_data, current_day, user.use_emissions); break;
         case save_user:
             Save(user, task_list, task_amount); break;
         case list_data:
@@ -46,7 +49,7 @@ int main(void) {
             Print_Task_List(task_list, task_amount, Day_To_Weekday(current_day)); break;
         case add_task:
             Add_Task(task_list, &task_amount); break;
-        
+
         case remove_task:
             if (sscanf(cmd_input, " %*s %*s %d", &task_id) == 1)
                 Remove_Task(task_list, &task_amount, task_id);
@@ -77,21 +80,20 @@ int main(void) {
 }
 
 /** Performs all necessary initialization and loading of structs and variables.
- *  @param p[i/o] Unsorted array of prices.
- *  @param p_sorted[i/o] Sorted array of prices.
- *  @param user[i/o] Pointer to the user structure with all user details.
- *  @param task_list[i/o]  Active array of tasks. 
- *  @param task_amount[i/o] Amount of non-empty tasks in the task array. */
+ *  @param data[i] 2D array of doubles containing the price or emission for each hour in a day (1-24).
+ *  @param user[i/o] User structure with all user details.
+ *  @param task_list[i/o] Active array of tasks. 
+ *  @param task_amount[i/o] Amount of non-empty tasks in the task array. 
+ *  @param current_day[i/o] Pointer to the current day (0-365) */
 void Initialize(double data[][2], User *user, task task_list[TASK_AMOUNT_MAX], int *task_amount, int *current_day) {
     time_t t = time(NULL);
     struct tm time = *localtime(&t);
     int i;
     char *weekday[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
          *current_day = time.tm_yday;
-    
-    /* Attempt to load user details. Starts setup if there is no file */
-    Reset_User(user);
 
+    /* Attempt to load user details. Starts setup with if there is no file */
+    Reset_User(user);
     if (Load_User_Details(user) != 1) {
         Print_Welcome();
         First_Time_Setup(user);
@@ -99,7 +101,7 @@ void Initialize(double data[][2], User *user, task task_list[TASK_AMOUNT_MAX], i
     }
 
     /* Attempts to load price and emission data. Terminates if there are none */
-    if (Calculate_kWh_Data(data, 0, *current_day, user->use_emissions) != 1) {
+    if (Load_kWh_Data(data, *current_day, user->use_emissions) != 1) {
         printf("Could not load data. Exiting...\n");
         exit(EXIT_FAILURE);
     }
@@ -146,7 +148,7 @@ void Save(User user, task task_list[TASK_AMOUNT_MAX], int task_amount) {
  *  @param user[i] User structure with all user details.
  *  @param task_list[][i] Array of task structures.
  *  @param task_amount[i] Amount of task structures in the task array.
- *  @param p[][][i] Unsorted array of prices.
+ *  @param data[i/o] 2D array of doubles containing the price or emission for each hour in a day (1-24).
  *  @param current_day[i] The day that prices are loaded from. Can be edited for debugging. */
 void Suggest_Day (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, double data[][2], int current_day) {
     int *assigned_hours = calloc(HOURS_PER_DAY, sizeof(int));
@@ -171,12 +173,12 @@ void Suggest_Day (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, d
  *  @param user[i] User structure with all user details.
  *  @param task_list[][i] Array of task structures.
  *  @param task_amount[i] Amount of task structures in the task array.
- *  @param p[][][i] Unsorted array of prices.
+ *  @param data[i/o] 2D array of doubles containing the price or emission for each hour in a day (1-24).
  *  @param current_day[i] The day that prices are loaded from. Can be edited for debugging. */
 void Suggest_Year (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, double data[][2], int current_day) {
     int *assigned_hours = calloc(HOURS_PER_DAY, sizeof(int));
     int i, day;
-    
+
     if (task_amount == 0) {
         printf("There are currently no tasks. Enter 'task add' to begin adding some.\n"); 
         return;
@@ -188,9 +190,9 @@ void Suggest_Year (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, 
         task_list[i].min_value = 0;
         task_list[i].total_days_yr = 0;
     }
-
+    
     for (day = 1; day <= DAYS_PER_YEAR; day++) {
-        Calculate_kWh_Data(data, 0, day, user.use_emissions);
+        Load_kWh_Data(data, day, user.use_emissions);
 
         for (i = 0; i < task_amount; i++) {
             if (!task_list[i].days[Day_To_Weekday(day)])
@@ -200,14 +202,15 @@ void Suggest_Year (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, 
         }
     }
     Print_Suggestions_Year (task_amount, task_list, user.use_emissions);
-    Calculate_kWh_Data (data, 0, current_day, user.use_emissions);
+    Load_kWh_Data (data, current_day, user.use_emissions);
 }
 
 /** Finds the starting hour with the lowest average price/emission over the task duration.
  *  @param user[i] User structure with all user details.
  *  @param p_task[i/o] Pointer to a task structure.
  *  @param assigned_hours[][i] Sees if there is an active task on the hour.
- *  @param p[][][i] Unsorted array of prices.
+ *  @param data[i/o] 2D array of doubles containing the price or emission for each hour in a day (1-24).
+ *  @param day[i] The day that prices are loaded from. Can be edited for debugging.
  *  @param do_year[i] Boolean to determine whether the yearly or daily savings should be calculated (true = 1, false = 0). */
 void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY], double data[][2], int day, int do_year) {
     int i, j,
@@ -231,7 +234,7 @@ void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY]
             end_hr = Wrap_Hour(i + duration);
         else
             end_hr = i + duration;
-        
+
         should_skip_hr = 0;
         cur_value = 0.0;
 
@@ -240,14 +243,14 @@ void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY]
         /* If the user is available in this hour, calculate the avg price values and attempt to assign them */
         if(!should_skip_hr) {
             for (j = 0; j < duration; j++) {
-                /* Handle 'overflowing' hours */
-                /* Eks. duration = 3, p_task->duration = 2.5, så skal den sidste times pris ganges med den resterende længde af tasken (0.5 timer) */
+                /* Handle 'overflowing' hours 
+                 Eks. duration = 3, p_task->duration = 2.5, så skal den sidste times pris ganges med den resterende længde af tasken (0.5 timer) */
                 if (p_task->duration > j && p_task->duration < (j + 1)) 
                     cur_value += p_task->power * (p_task->duration - j) * data[i + j][0];
                 else
                     cur_value += p_task->power * data[i + j][0];
             }
-            
+
             value_avg = cur_value / duration;
 
             if (value_avg > value_avg_max) {
@@ -262,7 +265,7 @@ void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY]
             }
         }
     }
-    
+
     /* If value_avg_min is unchanged, assume that no start hour was found */
     if (value_avg_min == AVERAGE_MIN && !do_year) {
         printf("Could not find a suitable start hour for task: %s\n", p_task->name);
@@ -275,9 +278,11 @@ void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY]
  *  @param user[i] User structure with all user details.
  *  @param p_task[i] Pointer to a task structure.
  *  @param assigned_hours[][i] Sees if there is an active task on the hour.
+ *  @param day[i] The day that prices are loaded from. Can be edited for debugging.
  *  @param start_hr[i] The start hour that is being checked for the given task.
  *  @param end_hr[i] The end hour that is being checked for the given task.
- *  @param do_year[i] Boolean to determine whether the yearly or daily savings should be calculated (true = 1, false = 0). */
+ *  @param do_year[i] Boolean to determine whether the yearly or daily savings should be calculated (true = 1, false = 0). 
+ *  @return 1 if the hour should be skipped, 0 otherwise */
 int Should_Skip_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY], int day, int start_hr, int end_hr, int do_year) {
     int i;
 
@@ -326,7 +331,7 @@ void Assign_Task (task *p_task, int start_hr, int end_hr, double price_min, doub
     }
 }
 
-/* Run all tests */
+/** Run all tests */
 void Test_All(void){
     Test_KW();
     Test_Wrap_Hours();
@@ -334,7 +339,7 @@ void Test_All(void){
     Test_Fixed_Percent();
 }
 
-/* Test the Wrap_hours function */
+/** Test the Wrap_hours function */
 void Test_Wrap_Hours(void) {
     int hour[3] = {22, 4, 25},
         expected_hour[3] = {22, 4, 1};
@@ -344,7 +349,7 @@ void Test_Wrap_Hours(void) {
     assert(expected_hour[2] == Wrap_Hour(hour[2]));
 }
 
-/* Test the Day_To_Weekday function */
+/** Test the Day_To_Weekday function */
 void Test_Day_To_Weekday(void) {
     int day[5] = {29, 364, 44, 59, 60},
         expected_day[5] = {6, 5, 0, 1, 2};
