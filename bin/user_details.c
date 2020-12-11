@@ -57,8 +57,8 @@ void Set_Available_Hours (User *user) {
 
     printf("Enter your available hours (0-23): ");
     fgets(temp_string, 10, stdin);
-    while (sscanf(temp_string, " %d %*c %d", &start_time, &end_time) != 2) { /* TEST */
-        printf("Please use correct formatting: HOUR-HOUR\n");
+    while (sscanf(temp_string, " %d-%d", &start_time, &end_time) != 2) {
+        printf("Please use correct formatting: HOUR-HOUR: ");
         fgets(temp_string, 10, stdin);
     }
 
@@ -95,7 +95,7 @@ void Print_User (User user) {
     Print_Line(1, "User");
     printf("Username: %s\n", user.user_name);
     printf("Ignore available hours: %s\n", user.ignore_availability ? "Yes" : "No");
-    printf("Using data: %s\n\n", user.use_emissions == 1 ? "Emissions" : "Prices");
+    printf("Using data: %s\n\n", user.use_emissions ? "Emissions" : "Prices");
     Print_Line(1, "Availability");
     
     printf("     ");

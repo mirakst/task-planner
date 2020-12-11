@@ -120,7 +120,7 @@ void Initialize(double data[], User *user, task task_list[TASK_AMOUNT_MAX], int 
         printf("Tasks today:\n");
         for (i = 0; i < *task_amount; i++) {
             if (task_list[i].days[Day_To_Weekday(*current_day)])
-                printf("(%d) %s\n", i, task_list[i].name);
+                printf("(%.2d) %s\n", i + 1, task_list[i].name);
         }
         printf("\n");
     }
@@ -151,7 +151,7 @@ void Save(User user, task task_list[TASK_AMOUNT_MAX], int task_amount) {
  *  @param data[i/o] Array of doubles containing the price or emission for each hour in a day (1-24).
  *  @param current_day[i] The day that prices are loaded from. Can be edited for debugging. */
 void Suggest_Day (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, double data[], int current_day) {
-    int *assigned_hours = calloc(HOURS_PER_DAY, sizeof(int));
+    int assigned_hours[HOURS_PER_DAY] = {0};
     int i;
 
     if (task_amount == 0) {
@@ -176,7 +176,7 @@ void Suggest_Day (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, d
  *  @param data[i/o] Array of doubles containing the price or emission for each hour in a day (1-24).
  *  @param current_day[i] The day that prices are loaded from. Can be edited for debugging. */
 void Suggest_Year (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, double data[], int current_day) {
-    int *assigned_hours = calloc(HOURS_PER_DAY, sizeof(int));
+    int assigned_hours[HOURS_PER_DAY] = {0};
     int i, day;
 
     if (task_amount == 0) {
@@ -222,7 +222,7 @@ void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY]
     double cur_value = 0.0,
            value_avg = 0.0,
            value_avg_max = 0.0,
-           value_avg_min = AVERAGE_MIN,
+           value_avg_min = __DBL_MAX__,
            value_min = 0.0, 
            value_max = 0.0;
 
@@ -234,19 +234,19 @@ void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY]
             end_hr = Wrap_Hour(i + duration);
         else
             end_hr = i + duration;
-
+    
         should_skip_hr = 0;
         cur_value = 0.0;
 
         should_skip_hr = Should_Skip_Hour(user, p_task, assigned_hours, day, i, end_hr, do_year);
-
         /* If the user is available in this hour, calculate the avg price values and attempt to assign them */
         if(!should_skip_hr) {
             for (j = 0; j < duration; j++) {
                 /* Handle 'overflowing' hours 
                  Eks. duration = 3, p_task->duration = 2.5, så skal den sidste times pris ganges med den resterende længde af tasken (0.5 timer) */
-                if (p_task->duration > j && p_task->duration < (j + 1)) 
+                if (p_task->duration > j && p_task->duration < (j + 1)) {
                     cur_value += p_task->power * (p_task->duration - j) * data[i + j];
+                }
                 else
                     cur_value += p_task->power * data[i + j];
             }
@@ -267,7 +267,7 @@ void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY]
     }
 
     /* If value_avg_min is unchanged, assume that no start hour was found */
-    if (value_avg_min == AVERAGE_MIN && !do_year) {
+    if (value_avg_min == __DBL_MAX__ && !do_year) {
         printf("Could not find a suitable start hour for task: %s\n", p_task->name);
         return;
     }
@@ -321,10 +321,12 @@ void Assign_Task (task *p_task, int start_hr, int end_hr, double price_min, doub
         p_task->end_hr = end_hr;
         p_task->min_value = price_min;
         p_task->max_value = price_max;
-
+        
         if (!p_task->type) {
             for (i = start_hr; i != end_hr; i++) {
-                Wrap_Hour(start_hr + i);
+                i = Wrap_Hour(i);
+                if (i == end_hr)
+                    break;
                 assigned_hours[i] = 1;
             }
         }

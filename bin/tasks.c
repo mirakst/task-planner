@@ -14,11 +14,11 @@ void Print_Task_List (task *task_list, int task_amount, int current_day) {
         return;
     }
 
-    Sort_Task_List(task_list);
+    Sort_Task_List(task_list, task_amount);
 
     Print_Line(1, "Task list");
     printf("%7s%6s%23s%14s%15s%9s%8s\n", "ID", "Name", "Power", "Duration", "Energy usage", "Type  ", "Today?");
-    for (i = 0; i < TASK_AMOUNT_MAX; i++) {
+    for (i = 0; i < task_amount; i++) {
         if (strcmp(task_list[i].name, EMPTY_TASK_NAME) != 0) {            
             printf("Task %2d: %-20s %4.1f kW %8.1f hrs %10.3f kWh %6c %6c\n", 
                     (i + 1),
@@ -63,7 +63,7 @@ int Load_Tasks (task *task_list, int *task_amount, char *file_location) {
         *task_amount += 1;
     }
     
-    Sort_Task_List(task_list);
+    Sort_Task_List(task_list, *task_amount);
     
     fclose(fp);
     return *task_amount > 0 ? 1 : 0;
@@ -84,7 +84,7 @@ int Save_Tasks (task *task_list, int task_amount, char *file_location) {
     if (fp == NULL) 
         return -1;
 
-    Sort_Task_List(task_list);
+    Sort_Task_List(task_list, task_amount);
     for (i = 0; i < task_amount; i++) {
         fprintf(fp, "name: %s, power: %f, duration: %f, type: %d, days: %d %d %d %d %d %d %d\n",
                 task_list[i].name, task_list[i].power, task_list[i].duration, task_list[i].type,
@@ -140,7 +140,7 @@ void Add_Task (task *task_list, int *task_amount) {
 
     *task_amount += 1;
     printf("Task: %s was successfully added.\n", task_list[id].name);
-    Sort_Task_List(task_list);
+    Sort_Task_List(task_list, *task_amount);
 }
 
 /** Sets or changes the name of a task.
@@ -158,7 +158,7 @@ void Set_Task_Name (char *name) {
  *  @param power[o] Power usage of the task (in Watts). */
 void Set_Task_Power (double *power) {
     printf("Power usage (watts): ");
-    *power = Get_Double_Input (TASK_POWER_MAX);
+    *power = Get_Double_Input (__INT_MAX__);
     *power /= W_PER_KW;
 }
 
@@ -216,15 +216,15 @@ void Remove_Task (task *task_list, int *task_amount, int id) {
     task_list[id].total_days_yr = 0;
 
     *task_amount -= 1;
-    Sort_Task_List(task_list);
+    Sort_Task_List(task_list, *task_amount);
     printf("Task: %s was successfully removed.\n", task_name);
 }
 
 /** Sort the input task array.
  *  The compare function Compare_Tasks() prioritizes non-empty tasks with the highest kWh usage.
  *  @param task_list[i] Active array of task structures. */
-void Sort_Task_List (task *task_list) {
-    qsort(task_list, TASK_AMOUNT_MAX, sizeof(task), Compare_Tasks);
+void Sort_Task_List (task *task_list, int task_amount) {
+    qsort(task_list, task_amount + 1, sizeof(task), Compare_Tasks);
 }
 
 /** Compare function for qsort for sorting tasks.
@@ -377,25 +377,20 @@ double Fixed_Percent(double max, double min) {
 
 /* Testing functions below */
 void Test_KW(void) {
-    task actual1,
-         actual2,
-         actual3;
-    double expected1 = 195.9,
-           expected2 = 5.031,
-           expected3 = 9315;
+    task actual1, actual2, actual3;
+    double expected[3] = {195.9, 5.031, 9315};
 
     actual1.power = 3.2650;
-    actual1.duration = 60;
-
     actual2.power = 0.3354;
-    actual2.duration = 15;
-
     actual3.power = 69;
+
+    actual1.duration = 60;
+    actual2.duration = 15;
     actual3.duration = 135;
 
-    assert(expected1 == Calculate_kWh(actual1));
-    assert(expected2 == Calculate_kWh(actual2));
-    assert(expected3 == Calculate_kWh(actual3));
+    assert(expected[0] == Calculate_kWh(actual1));
+    assert(expected[1] == Calculate_kWh(actual2));
+    assert(expected[2] == Calculate_kWh(actual3));
 }
 
 /* Test the Fixed_Percent function */

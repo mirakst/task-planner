@@ -15,7 +15,6 @@
 #include "bin/help.h"
 #include "bin/get_input.h"
 
-#define AVERAGE_MIN 10000.0
 #define INPUT_MAX 30
 #define DAYS_PER_YEAR 365
 #define FIRST_WEEKDAY_OF_YEAR 5

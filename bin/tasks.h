@@ -7,16 +7,15 @@
 #include "graphics.h"
 
 #define FILE_TASKLIST           "config/tasklist.cfg"
-#define EMPTY_TASK_NAME         "none"
-#define TASK_AMOUNT_MAX          20
-#define TASK_NAME_ALLOC          100
-#define TASK_NAME_MAX            21
-#define TASK_DURATION_MAX        1440
-#define TASK_POWER_MAX           50000
 #define MIN_PER_HOUR             60
 #define W_PER_KW                 1000
 #define G_PER_KG                 1000
 #define READ_LINE_MAX            100
+#define TASK_NAME_ALLOC          100
+#define EMPTY_TASK_NAME         "none"
+#define TASK_AMOUNT_MAX          20000
+#define TASK_NAME_MAX            21
+#define TASK_DURATION_MAX        1440
 
 typedef enum task_type {active, passive, timed} task_type;
 
@@ -64,7 +63,7 @@ void Set_Task_Power (double *);
 void Set_Task_Name (char *);
 void Set_Task_Days (int *);
 
-void Sort_Task_List (task *);
+void Sort_Task_List (task *, int);
 int Compare_Tasks (const void *, const void *);
 void Print_Task_List(task *, int, int);
 void Print_Suggestions_Day (int, task[TASK_AMOUNT_MAX], int, int);
