@@ -13,7 +13,7 @@
 #define READ_LINE_MAX            100
 #define TASK_NAME_ALLOC          100
 #define EMPTY_TASK_NAME         "none"
-#define TASK_AMOUNT_MAX          20000
+#define TASK_AMOUNT_MAX          5000
 #define TASK_NAME_MAX            21
 #define TASK_DURATION_MAX        1440
 

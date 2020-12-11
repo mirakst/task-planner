@@ -238,7 +238,7 @@ void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY]
         should_skip_hr = 0;
         cur_value = 0.0;
 
-        should_skip_hr = Should_Skip_Hour(user, p_task, assigned_hours, day, i, end_hr, do_year);
+        should_skip_hr = Should_Skip_Hour(user, *p_task, assigned_hours, day, i, end_hr);
         /* If the user is available in this hour, calculate the avg price values and attempt to assign them */
         if(!should_skip_hr) {
             for (j = 0; j < duration; j++) {
@@ -276,28 +276,28 @@ void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY]
 
 /** Checks whether a task can be assigned in the given start_hr and end_hr interval or not.
  *  @param user[i] User structure with all user details.
- *  @param p_task[i] Pointer to a task structure.
+ *  @param task[i] The task structure to be checked.
  *  @param assigned_hours[][i] Sees if there is an active task on the hour.
  *  @param day[i] The day that prices are loaded from. Can be edited for debugging.
  *  @param start_hr[i] The start hour that is being checked for the given task.
  *  @param end_hr[i] The end hour that is being checked for the given task.
- *  @param do_year[i] Boolean to determine whether the yearly or daily savings should be calculated (true = 1, false = 0). 
  *  @return 1 if the hour should be skipped, 0 otherwise */
-int Should_Skip_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY], int day, int start_hr, int end_hr, int do_year) {
+int Should_Skip_Hour (User user, task task, int assigned_hours[HOURS_PER_DAY], int day, int start_hr, int end_hr) {
     int i;
 
-    /* Skip to next start hour if the user is unavailable and does not want to use all hours */
-    if (p_task->type == passive && !user.ignore_availability && !user.available_hours[start_hr])
+    /* Skip to next start hour if the user does not ignore availability and is unavailable */
+    if (task.type == passive && !user.ignore_availability && !user.available_hours[start_hr])
             return 1;
     
     /* Prevent active tasks from ending outside the user's available hours */
-    if (p_task->type == active) 
+    if (task.type == active) {
         for (i = start_hr; i != end_hr; i++) {
             if (day == 365)
                 i = Wrap_Hour(i);
-            if ((!user.ignore_availability && !user.available_hours[Wrap_Hour(i)]) || (!do_year ? assigned_hours[Wrap_Hour(i)] : 0)) 
+            if ((!user.ignore_availability && !user.available_hours[Wrap_Hour(i)]) || assigned_hours[Wrap_Hour(i)])
                 return 1;
         }
+    }
     return 0;
 }
 

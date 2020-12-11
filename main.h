@@ -52,7 +52,7 @@ void Save (User, task[TASK_AMOUNT_MAX], int);
 void Suggest_Day (User, task[TASK_AMOUNT_MAX], int, double[], int);
 void Suggest_Year (User, task[TASK_AMOUNT_MAX], int, double[], int); 
 void Find_Start_Hour (User, task *, int[HOURS_PER_DAY], double[], int, int);
-int Should_Skip_Hour (User, task *, int[HOURS_PER_DAY], int, int, int, int);
+int Should_Skip_Hour (User, task, int[HOURS_PER_DAY], int, int, int);
 void Assign_Task (task *, int, int, double, double, int[HOURS_PER_DAY], int);
 
 /* Test functions */
