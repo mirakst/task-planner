@@ -5,11 +5,9 @@ tasks.o
 tasklist.txt
 prices.txt
 a.exe
-README.md
 main.exe
 main
 csv maker/date-get
 csv maker/co2_get
-doc/
 config/settings
 config/tasklist.cfg

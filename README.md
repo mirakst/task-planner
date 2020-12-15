@@ -1,2 +1,5 @@
-# upgraded-potato
-This is the repository for the P1 project by a405a
+# Task Planner
+The Task Planner program is developed as an attempt to help consumers schedule their electrical tasks in an efficient manner, in order to mitigate their climate impact.
+
+## Authors
+The program and all its documentation has been written by group A405a from Aalborg University, as part of their P1 project.

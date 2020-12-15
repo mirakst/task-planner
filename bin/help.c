@@ -1,7 +1,7 @@
 #include "help.h"
 
-/** Prints a startup message. 
- *  For better understanding of the program. */
+/** Prints a startup message 
+ *  to provide a better understanding of the program. */
 void Print_Welcome (void) {
     Print_Line(1, "Welcome!");
     printf("This program is designed to help the user with scheduling power-consuming tasks at\n"
@@ -15,7 +15,7 @@ void Print_Welcome (void) {
     printf("Enter 'help' for a list of all available commands.                                \n");
 }
 
-/** Calls Help_Tasks, Help_Data and Help_Settings. */
+/** Calls the other help functions and displays general settings. */
 void Help_All(void) {
     Help_Tasks(FALSE);
     Help_Data(FALSE);
@@ -28,7 +28,7 @@ void Help_All(void) {
 }
 
 /** Prints a list of helpful commands for tasks. 
- * @param b[i] int, if the list should end in a line. */
+ * @param b[i] Boolean to determine if the list should end with a line. */
 void Help_Tasks(int print_end_line) {
     Print_Line(TRUE, "Tasks");
     printf("About:\n");
@@ -49,7 +49,7 @@ void Help_Tasks(int print_end_line) {
 }
 
 /** Prints a list of helpful commands for data. 
- * @param b[i] int, if the list should end in a line. */
+ * @param b[i] Boolean to determine if the list should end with a line. */
 void Help_Data(int print_end_line) {
     Print_Line(TRUE, "Data");
     printf("About:\n");
@@ -65,7 +65,7 @@ void Help_Data(int print_end_line) {
 }
 
 /** Prints a list of helpful commands for User_Details. 
- *  @param b[i] int, if the list should end in a line. */
+ * @param b[i] Boolean to determine if the list should end with a line. */
 void Help_Settings(int print_end_line) {
     Print_Line(TRUE, "Settings");
     printf("About:\n");
