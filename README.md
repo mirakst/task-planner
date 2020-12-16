@@ -5,4 +5,4 @@ The Task Planner program is developed as an attempt to help consumers schedule t
 The program and all its documentation has been written by group A405a from Aalborg University, as part of their P1 project.
 
 ## Documentation
-All functions in the source code are documented by Doxygen at https://mirakst.github.io/upgraded-potato/index.html
+All functions in the source code are documented by Doxygen at https://mirakst.github.io/task-planner/index.html
