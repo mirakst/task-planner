@@ -24,9 +24,11 @@
 */
 var NAVTREE =
 [
-  [ "Task Planner", "index.html", [
-    [ "GitHub repository", "index.html#autotoc_md1", null ],
-    [ "Authors", "index.html#autotoc_md2", null ],
+  [ "Climate efficient scheduling of power consumption", "index.html", [
+    [ "Task Planner", "index.html", [
+      [ "GitHub repository", "index.html#autotoc_md1", null ],
+      [ "Authors", "index.html#autotoc_md2", null ]
+    ] ],
     [ "Data Structures", "annotated.html", [
       [ "Data Structures", "annotated.html", "annotated_dup" ],
       [ "Data Structure Index", "classes.html", null ],
@@ -52,7 +54,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"user__details_8h.html#acf87cef353b1bfee278b359679b04f11"
+"user__details_8h.html#acd04c1d9b175087ff5bb59b009314d2c"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
