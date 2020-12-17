@@ -28,8 +28,8 @@ void Read_And_Print (int month, int days_month, FILE *fin, FILE *fout) {
     int accum_emission = 0, emission = 0,
         hour, day, interval;
 
-    for (day = 0; day < days_month; day++) {
-        fprintf(fout, "%.2d.%.2d.2019: ", day + 1, month + 1);
+    for (day = 1; day <= days_month; day++) {
+        fprintf(fout, "%.2d.%.2d.2019: ", day, month + 1);
         for (hour = 0; hour < 24; hour++) {
 
             for (interval = 0; interval < INTERVAL_PER_HOUR; interval++) {

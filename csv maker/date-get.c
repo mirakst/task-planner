@@ -14,7 +14,7 @@ int main (void) {
     fin = fopen (filein, "r");
     fout = fopen (fileout, "w");
     
-    for (i = 0; i < 12; i++)
+    for (i = 1; i <= 12; i++)
         Read_And_Print (i, days_per_month[i], fin, fout);
 
     fclose(fin);
@@ -26,8 +26,8 @@ void Read_And_Print (int month, int days_month, FILE *fin, FILE *fout) {
     double price;
     int hour, day;
 
-    for (day = 0; day < days_month; day++) {
-        fprintf(fout, "%.2d.%.2d.2019: ", day + 1, month + 1);
+    for (day = 1; day <= days_month; day++) {
+        fprintf(fout, "%.2d.%.2d.2019: ", day, month);
 
         for (hour = 0; hour < 24; hour++) {
             fscanf(fin, "%lf", &price);

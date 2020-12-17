@@ -343,22 +343,16 @@ void Test_All(void){
 
 /** Test the Wrap_hours function */
 void Test_Wrap_Hours(void) {
-    int hour[3] = {22, 4, 25},
-        expected_hour[3] = {22, 4, 1};
-
-    assert(expected_hour[0] == Wrap_Hour(hour[0]));
-    assert(expected_hour[1] == Wrap_Hour(hour[1]));
-    assert(expected_hour[2] == Wrap_Hour(hour[2]));
+    assert(22 == Wrap_Hour(22));
+    assert(4 == Wrap_Hour(4));
+    assert(1 == Wrap_Hour(25));
 }
 
 /** Test the Day_To_Weekday function */
 void Test_Day_To_Weekday(void) {
-    int day[5] = {29, 364, 44, 59, 60},
-        expected_day[5] = {6, 5, 0, 1, 2};
-
-    assert(expected_day[0] == Day_To_Weekday(day[0]));
-    assert(expected_day[1] == Day_To_Weekday(day[1]));
-    assert(expected_day[2] == Day_To_Weekday(day[2]));
-    assert(expected_day[3] == Day_To_Weekday(day[3]));
-    assert(expected_day[4] == Day_To_Weekday(day[4]));
+    assert(6 == Day_To_Weekday(29));
+    assert(5 == Day_To_Weekday(364));
+    assert(0 == Day_To_Weekday(44));
+    assert(1 == Day_To_Weekday(59));
+    assert(2 == Day_To_Weekday(60));
 }
