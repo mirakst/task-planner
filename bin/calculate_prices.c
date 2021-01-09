@@ -20,11 +20,11 @@ int Load_kWh_Data (double data[], int current_day, int use_emissions) {
     }
 
     do {
-        if (current_day > 1)
+        if (current_day > 0)
             fscanf(fp, "%*[^\n] ");
         fscanf(fp, "%*[^ ]");
         i++;
-    } while (i < current_day);
+    } while (i <= current_day);
 
     for (i = 0; i < HOURS_PER_DAY * 2; i++) {
         if (current_day >= 364 && i > 23)
@@ -69,12 +69,13 @@ void Change_Day (double data[], int *current_day, int use_emissions) {
     fgets (temp_input, MAX_INPUT, stdin);
 
     if (sscanf(temp_input, " %d", current_day) == 1) {
+        (*current_day)--;
         if (*current_day > 365) {
             printf("Day is too high. Changed day to %d.\n", *current_day % 365);
             *current_day = *current_day % 365;
         }
-        else if (*current_day <= 0) {
-            *current_day = 1;
+        else if (*current_day < 0) {
+            *current_day = 0;
             printf("Day can't be 0 or below. Changed day to 1.\n");
         }
     }
@@ -82,5 +83,5 @@ void Change_Day (double data[], int *current_day, int use_emissions) {
         printf("Please use numbers only.\n");
 
     Load_kWh_Data (data, *current_day, use_emissions);
-    printf("Prices have been initialized from day: %d.\n", *current_day);
+    printf("Prices have been initialized from day: %d.\n", *current_day + 1);
 }
