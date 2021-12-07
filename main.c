@@ -152,6 +152,11 @@ void Suggest_Day (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, d
     int *assigned_hours = calloc(HOURS_PER_DAY, sizeof(int));
     int i;
 
+    if (task_amount == 0) {
+        printf("There are currently no tasks. Enter 'task add' to begin adding some.\n"); 
+        return;
+    }
+
     for (i = 0; i < task_amount; i++) {
         task_list[i].max_value = 0;
         task_list[i].min_value = 0;
@@ -172,6 +177,11 @@ void Suggest_Year (User user, task task_list[TASK_AMOUNT_MAX], int task_amount, 
     int *assigned_hours = calloc(HOURS_PER_DAY, sizeof(int));
     int i, day;
     
+    if (task_amount == 0) {
+        printf("There are currently no tasks. Enter 'task add' to begin adding some.\n"); 
+        return;
+    }
+
     /* Reset the relevant task variables */
     for (i = 0; i < task_amount; i++) {
         task_list[i].max_value = 0;
@@ -209,7 +219,7 @@ void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY]
     double cur_value = 0.0,
            value_avg = 0.0,
            value_avg_max = 0.0,
-           value_avg_min = FUCKING_BIG_ASS_NUMBER,
+           value_avg_min = AVERAGE_MIN,
            value_min = 0.0, 
            value_max = 0.0;
 
@@ -253,9 +263,9 @@ void Find_Start_Hour (User user, task *p_task, int assigned_hours[HOURS_PER_DAY]
         }
     }
     
-    /* If price_min is unchanged, assume that no start hour was found */
-    if (value_avg_min == 100 && !do_year) {
-        printf("Could not find a suitable start hour for task %s\n", p_task->name);
+    /* If value_avg_min is unchanged, assume that no start hour was found */
+    if (value_avg_min == AVERAGE_MIN && !do_year) {
+        printf("Could not find a suitable start hour for task: %s\n", p_task->name);
         return;
     }
     Assign_Task(p_task, best_hr_start, best_hr_end, value_min, value_max, assigned_hours, do_year);

@@ -16,7 +16,7 @@ void Print_Task_List (task *task_list, int task_amount, int current_day) {
     Sort_Task_List(task_list);
 
     Print_Line(1, "Task list");
-    printf("%7s%6s%23s%14s%15s%9s%8s\n", "ID", "Name", "Power", "Duration", "Energy usage", "Status", "Today?");
+    printf("%7s%6s%23s%14s%15s%9s%8s\n", "ID", "Name", "Power", "Duration", "Energy usage", "Type  ", "Today?");
     for (i = 0; i < TASK_AMOUNT_MAX; i++) {
         if (strcmp(task_list[i].name, EMPTY_TASK_NAME) != 0) {            
             printf("Task %2d: %-20s %4.1f kW %8.1f hrs %10.3f kWh %6c %6c\n", 
@@ -67,13 +67,6 @@ int Load_Tasks (task *task_list, int *task_amount, char *file_location) {
     return *task_amount > 0 ? 1 : 0;
 }
 
-/** Calculate the kWh usage of a given task.
- *  @param task[i] A non-empty task structure from the task array. 
- *  @return The kWh usage of the task as a double. */
-double Calculate_kWh (task task) {
-    return task.power * task.duration;
-}
-
 /** Save all tasks from the task array to the config file.
  *  @param task_list[i] Active array of task structures.
  *  @param task_amount[i]  Amount of non-empty tasks in the array. 
@@ -90,7 +83,7 @@ int Save_Tasks (task *task_list, int task_amount, char *file_location) {
 
     Sort_Task_List(task_list);
     for (i = 0; i < task_amount; i++) {
-        fprintf(fp, "name: %s, power: %f, duration: %.1f, passive: %d, days: %d %d %d %d %d %d %d\n",
+        fprintf(fp, "name: %s, power: %f, duration: %.1f, type: %d, days: %d %d %d %d %d %d %d\n",
                 task_list[i].name, task_list[i].power, task_list[i].duration, task_list[i].type,
                 task_list[i].days[0], task_list[i].days[1], task_list[i].days[2], 
                 task_list[i].days[3], task_list[i].days[4], task_list[i].days[5], 
@@ -99,6 +92,13 @@ int Save_Tasks (task *task_list, int task_amount, char *file_location) {
 
     fclose(fp);
     return 1;
+}
+
+/** Calculate the kWh usage of a given task.
+ *  @param task[i] A non-empty task structure from the task array. 
+ *  @return The kWh usage of the task as a double. */
+double Calculate_kWh (task task) {
+    return task.power * task.duration;
 }
 
 /** Reset all variables in the given task structure.
@@ -312,7 +312,7 @@ void Print_Suggestions_Day (int task_amount, task task_list[TASK_AMOUNT_MAX], in
     char type[3] = {'A', 'P', 'T'};
 
     Print_Line(1, "Task Suggestions");
-    printf("%-20s %-12s %-10s %-14s %-14s %-8s\n", "Task", "Status", "Hours", "Min value", "Max value", "Savings");
+    printf("%-20s %-12s %-10s %-14s %-14s %-8s\n", "Task", "Type  ", "Hours", "Min value", "Max value", "Savings");
     for (i = 0; i < task_amount; i++) {
         if (!task_list[i].days[current_day] || !task_list[i].min_value)
             continue;
